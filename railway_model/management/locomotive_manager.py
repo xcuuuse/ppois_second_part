@@ -6,7 +6,7 @@ class LocomotiveManager:
     def __init__(self):
         self.__qualification_level: int = 1
         self.__repaired_locomotives: int = 0
-        self.__max_level = 5
+        self.__max_level: int = 5
         self.__locomotives: list[Locomotive] = []
         self.__numbers: list[int] = [i.number for i in self.__locomotives]
 

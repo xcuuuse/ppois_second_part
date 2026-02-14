@@ -17,6 +17,10 @@ class Coach:
     def seats(self):
         return self.__seats
 
+    @property
+    def seat_price(self):
+        return self.__seat_price
+
     def occupy_seat(self, number: int, pass_id: int):
         if number not in self.__seats.keys():
             raise SeatError("Incorrect seat number")
