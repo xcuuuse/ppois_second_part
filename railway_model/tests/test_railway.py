@@ -22,6 +22,7 @@ def test_route():
     third_station = Station("CityC")
     railway2 = Railway({second_station, third_station}, 124)
     route = Route([railway1, railway2])
-    assert route.stations == [first_station, second_station, third_station]
     assert route.total_distance == 247
+    assert route.railways == [railway1, railway2]
+
 

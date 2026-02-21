@@ -27,6 +27,13 @@ class LocomotiveManager:
         if self.__repaired_locomotives % 10 == 0:
             self.upgrade_level()
 
+    def check_locomotive(self, locomotive: Locomotive):
+        if locomotive.check_state():
+            print("The locomotive is working correctly")
+        else:
+            print("The locomotive has to be serviced")
+            self.service_locomotive(locomotive)
+
 
 
 
