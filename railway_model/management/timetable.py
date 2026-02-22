@@ -13,3 +13,5 @@ class Timetable:
         for cell in self.cells:
             print(cell)
 
+    def remove_cell(self, cell: TimetableCell):
+        self.cells.remove(cell)
