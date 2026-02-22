@@ -7,8 +7,10 @@ from enums.enums import TrainState
 
 
 class Serializer:
+    STATE_FILE = "train_state.json"
+
     @staticmethod
-    def save(compound: Compound, path="train_state.json"):
+    def save(compound: Compound, path=STATE_FILE):
         data = {
             "compound_id": compound.compound_id,
             "locomotive": {
@@ -21,6 +23,7 @@ class Serializer:
             "coaches": [{
                 "number": coach.number,
                 "seats_amount": len(coach.seats),
+                "seat_price": coach.seat_price,
                 "seats": {str(k): v for k, v in coach.seats.items()}
             } for coach in compound.coaches],
             "current_pos": compound.current_pos,
@@ -30,7 +33,7 @@ class Serializer:
             json.dump(data, f, indent=2)
 
     @staticmethod
-    def load(path="train_state.json"):
+    def load(path=STATE_FILE):
         if not Path(path).exists():
             raise FileNotFoundError("State file not found")
 

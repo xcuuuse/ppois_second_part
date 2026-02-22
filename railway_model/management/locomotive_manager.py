@@ -10,7 +10,7 @@ class LocomotiveManager:
         self.__locomotives: list[Locomotive] = []
         self.__numbers: list[int] = [i.number for i in self.__locomotives]
 
-    def upgrade_level(self):
+    def __upgrade_level(self):
         if self.__qualification_level + 1 > self.__max_level:
             self.__qualification_level = self.__max_level
         else:
@@ -19,20 +19,21 @@ class LocomotiveManager:
     def add_locomotive(self, locomotive: Locomotive):
         self.__locomotives.append(locomotive)
 
-    def service_locomotive(self, locomotive: Locomotive):
+    def __service_locomotive(self, locomotive: Locomotive):
         if locomotive.number not in self.__numbers:
             raise LocomotiveUsingError("The locomotive does not exist")
         locomotive.get_service()
         self.__repaired_locomotives += 1
         if self.__repaired_locomotives % 10 == 0:
-            self.upgrade_level()
+            self.__upgrade_level()
+        print("The locomotive has been serviced")
 
     def check_locomotive(self, locomotive: Locomotive):
         if locomotive.check_state():
             print("The locomotive is working correctly")
         else:
             print("The locomotive has to be serviced")
-            self.service_locomotive(locomotive)
+            self.__service_locomotive(locomotive)
 
 
 
