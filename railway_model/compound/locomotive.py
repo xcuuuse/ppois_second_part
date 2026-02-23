@@ -7,10 +7,10 @@ class Locomotive:
     def __init__(self, number: int):
         Validator.validate(locals(), {"number": (int, lambda x: x >= 0)})
         self.number = number
-        self.usage_count = 0
-        self.is_usable = True
-        self.minimum_damage_level = 0.01
-        self.maximum_damage_level = 0.3
+        self.usage_count: int = 0
+        self.is_usable: bool = True
+        self.minimum_damage_level: float = 0.01
+        self.maximum_damage_level: float = 0.3
 
     def check_state(self):
         if self.is_usable:
@@ -23,8 +23,6 @@ class Locomotive:
         if not self.is_usable:
             raise LocomotiveUsingError("The locomotive is broken")
         self.usage_count += 1
-
-
 
     def get_service(self):
         self.usage_count = 0

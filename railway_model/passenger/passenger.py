@@ -14,7 +14,7 @@ class Passenger:
         self.__passenger_id = Passenger._id_counter
         Passenger._id_counter += 1
         self.__name = name
-        self.__tickets: list[Ticket] = []
+        self.__tickets: List[Ticket] = []
         self.__finance = finance
 
     @property

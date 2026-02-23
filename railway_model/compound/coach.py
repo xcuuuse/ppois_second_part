@@ -2,6 +2,7 @@ from exceptions.exceptions import SeatError
 from management.validator import Validator
 
 
+
 class Coach:
     def __init__(self, number: int, seats_amount: int, seat_price: int):
         Validator.validate(locals(), {

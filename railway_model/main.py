@@ -1,4 +1,7 @@
-from cli.cli import cli
+from cli.cli import Cli
 
 if __name__ == "__main__":
-    cli()
+    Cli.cli()
+
+# FINISH CLI, A FUNCTION IN COMPOUND, DIAGRAMS & DO QUESTIONS
+# +- TOMORROW, WSD, TH
