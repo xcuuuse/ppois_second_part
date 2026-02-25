@@ -1,0 +1,22 @@
+@startuml
+state CompoundState{
+  state STOPPED: Начальное состояние
+  state AT_STATION: На станции
+  state MOVING : В движении
+  state MAINTENANCE: На техобслуживании
+
+  [*] -> STOPPED : создание состава
+  STOPPED --> MOVING: move()\n[поезд не сломан и двигается]
+  MOVING --> AT_STATION: [поезд остановился]
+
+  STOPPED --> MAINTENANCE: check_compound()\n[поезд на техобслуживании]
+
+  STOPPED--> [*] : завершение программы
+  AT_STATION--> [*] : завершение программы
+  MOVING--> [*] : завершение программы
+  MAINTENANCE --> [*] : завершение программы
+}
+@enduml
+
+
+

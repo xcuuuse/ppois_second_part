@@ -45,7 +45,6 @@ class Compound:
             return
         current_station = route.stations[self.__current_pos]
         print(f"The compound {self.__compound_id} arrived at {current_station.name}")
-        self.process_station_actions(current_station)
         self.__current_pos += 1
 
         if self.__current_pos < len(route.stations):
@@ -55,14 +54,16 @@ class Compound:
             print(f"The compound {self.__compound_id} has completed the route")
             self.state = TrainState.STOPPED
 
-    def process_station_actions(self, station: Station):
+    def process_station_actions(self):
         if self.state != TrainState.MOVING:
             raise InvalidStateError("Cannot process station actions from this state")
         self.state = TrainState.AT_STATION
-        # add logic to free and occupy seats I think
+        for coach in self.coaches:
+            coach.free_coach()
 
     def check_state(self):
-        self.locomotive.check_state()
-
+        if not self.locomotive.check_state():
+            self.state = TrainState.MAINTENANCE
+        self.state = TrainState.STOPPED
 
 

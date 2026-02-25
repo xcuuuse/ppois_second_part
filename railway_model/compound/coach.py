@@ -42,5 +42,8 @@ class Coach:
             raise SeatError("Incorrect seat number to free")
         self.__seats[number] = None
 
+    def free_coach(self):
+        for i in self.__seats:
+            self.free_seat(i)
 
 

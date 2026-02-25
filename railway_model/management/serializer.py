@@ -46,7 +46,7 @@ class Serializer:
                 }
             )
         data = {
-            "global_state": {  # ✅ ПРАВИЛЬНО: на верхнем уровне
+            "global_state": {
                 "compound_id_counter": Compound._Compound__compound_id_counter
             },
             "compounds": compounds_data,

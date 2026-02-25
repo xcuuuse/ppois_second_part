@@ -1,0 +1,178 @@
+@startuml
+set namespaceSeparator none
+
+class "Coach" as compound.Coach {
+  -number : int
+  -seat_price : int
+  -seats : dict
+  +number : int
+  +seats : dict
+  +seat_price : int
+  +free_seats : List[int]
+  +occupy_seat(number: int, pass_id: int) -> None
+  +free_seat(number: int) -> None
+  +free_coach() -> None
+}
+
+class "Locomotive" as compound.Locomotive {
+  -number : int
+  -usage_count : int = 0
+  -is_usable : bool = true
+  -minimum_damage_level : float = 0.01
+  -maximum_damage_level : float = 0.3
+  +check_state() -> None
+  +start_engine() -> None
+  +get_service() -> None
+}
+
+class "Compound" as compound.Compound {
+  -{static} __compound_id_counter : int = 1
+  -compound_id : int
+  -current_pos : int = 0
+  -locomotive : Locomotive
+  -coaches : List[Coach]
+  -state : TrainState
+  +compound_id : int
+  +current_pos : int
+  +add_coach(coach: Coach) -> None
+  +move_along_route(route: Route) -> None
+  +process_station_actions() -> None
+  +check_state() -> None
+}
+
+class "LocomotiveManager" as management.locomotive_manager.LocomotiveManager {
+  -qualification_level : int = 1
+  -repaired_locomotives : int = 0
+  -max_level : int = 5
+  -locomotives : List[Locomotive]
+  -numbers : List[int]
+  +add_locomotive(locomotive: Locomotive) -> None
+  +check_locomotive(locomotive: Locomotive) -> None
+}
+
+
+class "RouteManager" as management.route_manager.RouteManager {
+  -route : Route
+  -compound : Compound
+  -timetable : Timetable
+  -time : int = 0
+  -running : bool = false
+  -timer_thread : Thread
+  +control_route_action() -> None
+  +start_timer() -> None
+  +stop_timer() -> None
+}
+
+class "TicketManager" as management.ticket_manager.TicketManager {
+  {static} +create_ticket(passenger: Passenger,compound: Compound, coach: Coach, seat_number: int, time: int) -> None
+}
+
+class "Serializer" as management.serializer.Serializer {
+  {static} STATE_FILE : str = "state.json"
+  +{static} save(timetable: Timetable, path: str = STATE_FILE) -> str
+  +{static} load(path: str = STATE_FILE) -> Timetable
+}
+
+class "Timetable" as management.timetable.Timetable {
+  -cells : List[TimetableCell]
+  +show_all() -> None
+  +remove_cell(cell: TimetableCell) -> None
+}
+
+class "TimetableCell" as management.timetable.TimetableCell {
+  -compound : Compound
+  -route : Route
+  -time : int
+  +__str__() -> str
+}
+
+class "TimetableManager" as management.timetable_manager.TimetableManager {
+  {static} +add_cell(cell: TimetableCell, timetable: Timetable) -> None
+  {static} +remove_cell(cell: TimetableCell, timetable: Timetable) -> None
+}
+
+class "Passenger" as passenger.Passenger {
+  -passenger_id : int
+  -name : str
+  -finance : int
+  -tickets : List[Ticket]
+  +{static} __id_counter : int = 1
+  +get_ticket(ticket: Ticket) -> None
+  +change_finance(amount: int) -> None
+}
+
+class "Ticket" as passenger.Ticket {
+  -ticket_id : int
+  -train_id : int
+  -start_station : Station
+  -end_station : Station
+  -coach : int
+  -seat : int
+  -time : int
+  -price : int
+}
+
+class "Station" as railway.Station {
+  -name : str
+}
+
+class "Railway" as railway.Railway {
+  -stations : Set[Station]
+  -length : int
+}
+
+
+class "TicketSellingError" as exceptions.TicketSellingError {
+  +__init__(message: str) -> None
+}
+
+class "SeatError" as exceptions.SeatError {
+  +__init__(message: str) -> None
+}
+
+class "LocomotiveUsingError" as exceptions.LocomotiveUsingError {
+  +__init__(message: str) -> None
+}
+
+class "TimetableError" as exceptions.TimetableError {
+  +__init__(message: str) -> None
+}
+
+class "CreatingEntityError" as exceptions.CreatingEntityError {
+  +__init__(message: str) -> None
+}
+
+class "InvalidStateError" as exceptions.InvalidStateError {
+  +__init__(message: str) -> None
+}
+
+class "Validator" as management.validator.Validator {
+  {static} +validate(data: dict, rules: Dict[str, tuple]) -> None
+}
+
+compound.Compound *-- compound.Locomotive : locomotive
+compound.Compound *-- compound.Coach : coach
+compound.Compound --> enums.TrainState : state
+management.timetable.Timetable *-- management.timetable.TimetableCell : cell
+management.timetable.TimetableCell --> compound.Compound : compound
+management.timetable.TimetableCell --> railway.Route : route
+railway.Route *-- railway.Station : station
+railway.Railway *-- "2" railway.Station : connects
+passenger.Passenger *--  passenger.Ticket : ticket
+passenger.Ticket --> railway.Station : start
+passenger.Ticket --> railway.Station : end
+management.serializer.Serializer --> management.timetable.Timetable : serializer
+management.locomotive_manager.LocomotiveManager *--  compound.Locomotive : manages
+management.route_manager.RouteManager --> railway.Route : uses
+management.route_manager.RouteManager --> compound.Compound : controls
+management.route_manager.RouteManager --> management.timetable.Timetable :uses
+management.ticket_manager.TicketManager --> passenger.Passenger : uses
+management.ticket_manager.TicketManager --> compound.Compound : uses
+management.ticket_manager.TicketManager --> compound.Coach : uses
+management.timetable_manager.TimetableManager --> management.timetable.Timetable : manages
+management.timetable_manager.TimetableManager --> management.timetable.TimetableCell : manages
+management.validator.Validator --> exceptions.CreatingEntityError : rai
+management.ticket_manager.TicketManager --> exceptions.TicketSellingError: uses
+locomotive.Locomotive --> exceptions.LocomotiveUsingError : raises
+management.timetable_manager.TimetableManager --> exceptions.TimetableError: uses
+@enduml

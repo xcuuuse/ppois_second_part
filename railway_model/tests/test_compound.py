@@ -36,13 +36,13 @@ def test_locomotive():
 
 
 
-"""def test_compound():
+def test_compound():
     locomotive = Locomotive(34)
     compound = Compound(locomotive, [])
     coach1 = Coach(1, 5, 26)
     coach2 = Coach(2, 6, 37)
     compound.add_coach(coach2)
     compound.add_coach(coach1)
-    assert compound.coaches == [coach1, coach2] """
+    assert compound.coaches == [coach1, coach2]
 
 
