@@ -43,7 +43,9 @@ class Coach:
         self.__seats[number] = None
 
     def free_coach(self):
-        for i in self.__seats:
+        for i in self.__seats.keys():
+            if i in self.free_seats:
+                continue
             self.free_seat(i)
 
 

@@ -40,22 +40,17 @@ class Compound:
         if self.state != TrainState.STOPPED and self.state != TrainState.AT_STATION:
             raise InvalidStateError("Cannot move from this state")
         self.state = TrainState.MOVING
+        self.__current_pos += 1
         if self.__current_pos >= len(route.stations):
-            print("The compound has completed the route")
+            print(f"The compound {self.__compound_id} has completed the route")
+            self.state = TrainState.STOPPED
             return
         current_station = route.stations[self.__current_pos]
         print(f"The compound {self.__compound_id} arrived at {current_station.name}")
-        self.__current_pos += 1
-
-        if self.__current_pos < len(route.stations):
-            next_station = route.stations[self.__current_pos]
-            print(f"The compound {self.__compound_id} is moving towards {next_station.name}")
-        else:
-            print(f"The compound {self.__compound_id} has completed the route")
-            self.state = TrainState.STOPPED
+        self.state = TrainState.AT_STATION
 
     def process_station_actions(self):
-        if self.state != TrainState.MOVING:
+        if self.state != TrainState.AT_STATION:
             raise InvalidStateError("Cannot process station actions from this state")
         self.state = TrainState.AT_STATION
         for coach in self.coaches:

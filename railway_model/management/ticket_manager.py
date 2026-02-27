@@ -14,8 +14,8 @@ class TicketManager:
         if seat_number not in coach.seats.keys():
             raise TicketSellingError("Wrong seat number")
         if coach not in compound.coaches:
-            raise TicketSellingError("Wrong coach number")
-        passenger.change_finance(coach.seat_price)
+            raise TicketSellingError("Wrong coach")
+        passenger.change_finance(-coach.seat_price)
         coach.occupy_seat(seat_number, passenger.passenger_id)
         ticket = Ticket(compound, coach, seat_number, time)
         passenger.get_ticket(ticket)

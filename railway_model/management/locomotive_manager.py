@@ -11,6 +11,10 @@ class LocomotiveManager:
         self.__locomotives: List[Locomotive] = []
         self.__numbers: list[int] = [i.number for i in self.__locomotives]
 
+    @property
+    def qualification_level(self):
+        return self.__qualification_level
+
     def __upgrade_level(self):
         if self.__qualification_level + 1 > self.__max_level:
             self.__qualification_level = self.__max_level
@@ -19,13 +23,14 @@ class LocomotiveManager:
 
     def add_locomotive(self, locomotive: Locomotive):
         self.__locomotives.append(locomotive)
+        self.__numbers.append(locomotive.number)
 
     def __service_locomotive(self, locomotive: Locomotive):
         if locomotive.number not in self.__numbers:
             raise LocomotiveUsingError("The locomotive does not exist")
-        locomotive.get_service()
+        locomotive.is_usable = True
         self.__repaired_locomotives += 1
-        if self.__repaired_locomotives % 10 == 0:
+        if self.__repaired_locomotives % 2 == 0:
             self.__upgrade_level()
 
         print("The locomotive has been serviced")

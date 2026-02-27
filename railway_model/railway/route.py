@@ -1,5 +1,4 @@
 from typing import List
-from .station import Station
 from .railway import Railway
 
 

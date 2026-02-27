@@ -11,7 +11,7 @@ class Timetable:
 
     def show_all(self):
         for cell in self.cells:
-            print(cell)
+            print(str(cell))
 
     def remove_cell(self, cell: TimetableCell):
         self.cells.remove(cell)

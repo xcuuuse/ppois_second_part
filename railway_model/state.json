@@ -1,6 +1,6 @@
 {
   "global_state": {
-    "compound_id_counter": 3
+    "compound_id_counter": 2
   },
   "compounds": [
     {
@@ -39,67 +39,11 @@
       ],
       "current_pos": 0,
       "state": "stopped"
-    },
-    {
-      "compound_id": 2,
-      "locomotive": {
-        "number": 1,
-        "usage_count": 0,
-        "is_usable": true,
-        "min_damage": 0.01,
-        "max_damage": 0.3
-      },
-      "coaches": [
-        {
-          "number": 1,
-          "seats_amount": 10,
-          "seat_price": 25,
-          "seats": {
-            "1": null,
-            "2": null,
-            "3": null,
-            "4": null,
-            "5": null,
-            "6": null,
-            "7": null,
-            "8": null,
-            "9": null,
-            "10": null
-          }
-        },
-        {
-          "number": 2,
-          "seats_amount": 10,
-          "seat_price": 25,
-          "seats": {
-            "1": null,
-            "2": null,
-            "3": null,
-            "4": null,
-            "5": null,
-            "6": null,
-            "7": null,
-            "8": null,
-            "9": null,
-            "10": null
-          }
-        }
-      ],
-      "current_pos": 1,
-      "state": "moving"
     }
   ],
   "timetable": [
     {
       "compound_id": 1,
-      "route": [
-        "A",
-        "O"
-      ],
-      "time": 1200
-    },
-    {
-      "compound_id": 2,
       "route": [
         "A",
         "O"
