@@ -38,10 +38,6 @@ class Cli:
         ])
 
     @staticmethod
-    def __create_route(main_station: Station, add_station: Station, length=100):
-        return Route([Railway({main_station, add_station}, length)])
-
-    @staticmethod
     def __find_cell_by_comp_id(timetable: Timetable, compound_id: int):
         for cell in timetable.cells:
             if cell.compound.compound_id == compound_id:
