@@ -38,9 +38,7 @@ def test_locomotive():
         wrong_locomotive = Locomotive(-1)
         wrong_locomotive2 = Locomotive('abc')
     manager = LocomotiveManager()
-    manager.add_locomotive(locomotive)
     manager.check_locomotive(locomotive)
-    manager.add_locomotive(locomotive)
     assert locomotive.is_usable
     locomotive.start_engine()
     assert locomotive.usage_count == 1

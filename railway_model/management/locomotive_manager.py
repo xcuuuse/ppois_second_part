@@ -21,26 +21,17 @@ class LocomotiveManager:
         else:
             self.__qualification_level += 1
 
-    def add_locomotive(self, locomotive: Locomotive):
-        self.__locomotives.append(locomotive)
-        self.__numbers.append(locomotive.number)
-
-    def __service_locomotive(self, locomotive: Locomotive):
-        if locomotive.number not in self.__numbers:
-            raise LocomotiveUsingError("The locomotive does not exist")
+    @staticmethod
+    def __service_locomotive(locomotive: Locomotive):
         locomotive.is_usable = True
-        self.__repaired_locomotives += 1
-        if self.__repaired_locomotives % 2 == 0:
-            self.__upgrade_level()
-
         print("The locomotive has been serviced")
 
-    def check_locomotive(self, locomotive: Locomotive):
-        if locomotive.check_state():
-            print("The locomotive is working correctly")
+    @staticmethod
+    def check_locomotive(locomotive: Locomotive):
+        if not locomotive.check_state():
+            LocomotiveManager.__service_locomotive(locomotive)
         else:
-            print("The locomotive has to be serviced")
-            self.__service_locomotive(locomotive)
+            print("All ok")
 
 
 

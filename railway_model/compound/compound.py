@@ -26,6 +26,10 @@ class Compound:
     def compound_id(self):
         return self.__compound_id
 
+    @classmethod
+    def get_id_counter(cls) -> int:
+        return cls._Compound__compound_id_counter
+
     @property
     def current_pos(self):
         return self.__current_pos

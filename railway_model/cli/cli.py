@@ -12,6 +12,7 @@ from management.passenger_serializer import PassengerSerializer
 from railway.station import Station
 from management.validator import Validator
 from management.timetable_manager import TimetableManager
+from management.locomotive_manager import LocomotiveManager
 
 
 class Cli:
@@ -70,7 +71,6 @@ class Cli:
         print(f"State: {compound.state.name}")
         print("\nCoaches:")
         for coach in compound.coaches:
-            free = len(coach.free_seats)
             print(f"Coach {coach.number} (price: {coach.seat_price}): {coach.free_seats} free seats")
 
     @staticmethod
@@ -81,7 +81,7 @@ class Cli:
         print(f"\nMoving compound {compound.compound_id}")
         compound.move_along_route(route)
         if compound.current_pos == len(route.stations) - 1:
-            print(f"Compound {compound.compound_id} reached final station, freeing seats...")
+            print(f"Compound {compound.compound_id} reached final station, freeing seats")
             compound.process_station_actions()
             PassengerSerializer.remove_tickets_for_compound(compound.compound_id)
 
@@ -103,12 +103,13 @@ class Cli:
         PassengerSerializer.save_passenger(passenger)
         print(f"Seat {parser.seat} in coach {parser.coach} booked for passenger {parser.pass_id}")
         print(
-            f"Departure time: {Timer.format_time(cell.time)}, Route: {route.stations[0].name}->{route.stations[-1].name}")
+            f"Departure time: {Timer.format_time(cell.time)},"
+            f" Route: {route.stations[0].name}->{route.stations[-1].name}")
 
     @staticmethod
     def __service(cell: TimetableCell):
         locomotive = cell.compound.locomotive
-        locomotive.get_service()
+        LocomotiveManager.check_locomotive(locomotive)
 
     @staticmethod
     def __create(timetable, args):
@@ -162,7 +163,7 @@ class Cli:
                 return 0
 
             match arguments.command:
-                case "create":
+                case "compound":
                     Cli.__create(timetable, arguments)
                 case "state":
                     Cli.__state(Cli.__get_cell(timetable, arguments.state_id))
@@ -171,7 +172,7 @@ class Cli:
                 case "service":
                     Cli.__service(Cli.__get_cell(timetable, arguments.number_to_service))
                 case "timetable":
-                    timetable.show_all()
+                    TimetableManager.show_timetable(timetable)
                 case "passenger":
                     Cli.__passenger(arguments)
                 case "tick":

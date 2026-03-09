@@ -35,9 +35,11 @@ class Timer:
     def format_time(minutes: int) -> str:
         if minutes < 0:
             raise TimetableError("Minutes value has to be more than xero")
-        h, m = divmod(minutes, 60)
-        return f"{h:02d}:{m:02d}"
+        hour = minutes // 60
+        minute = minutes - hour * 60
+        return f"{hour:02d}:{minute:02d}"
 
     @staticmethod
     def reset_time():
         Timer.save_time(0)
+

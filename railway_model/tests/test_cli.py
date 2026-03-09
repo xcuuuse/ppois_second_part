@@ -36,7 +36,7 @@ def test_cli_timetable():
 
 
 def test_cli_create_and_state():
-    run_cli("create", "1", "2", "A")
+    run_cli("compound", "1", "2", "A")
     result = run_cli("state", "1")
     assert result == 0
 
@@ -47,7 +47,7 @@ def test_cli_create_passenger():
 
 
 def test_cli_book_passenger_not_found():
-    run_cli("create", "1", "2", "A")
+    run_cli("compound", "1", "2", "A")
     result = run_cli("book", "1", "1", "1", "999")
     assert result == 1
 

@@ -27,11 +27,11 @@ class PassengerSerializer:
             "finance": passenger.finance,
             "tickets": [
                 {
-                    "compound_id": t.compound.compound_id,
-                    "coach_number": t.coach.number,
-                    "seat_number": t.seat_number,
-                    "time": t.time
-                } for t in passenger.tickets
+                    "compound_id": ticket.compound.compound_id,
+                    "coach_number": ticket.coach.number,
+                    "seat_number": ticket.seat_number,
+                    "time": ticket.time
+                } for ticket in passenger.tickets
             ]
         }
         data["id_counter"] = Passenger.id_counter
@@ -55,9 +55,9 @@ class PassengerSerializer:
             compound = compounds.get(ticket["compound_id"])
             if compound:
                 coach = next((coach for coach in compound.coaches if coach.number == ticket["coach_number"]), None)
-                if coach:
+                if coach: #money
                     ticket = Ticket(compound, coach, ticket["seat_number"], ticket["time"])
-                    passenger._Passenger__tickets.append(ticket)
+                    passenger.get_ticket(ticket)
         return passenger
 
     @staticmethod

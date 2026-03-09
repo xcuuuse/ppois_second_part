@@ -25,16 +25,17 @@ class Parser:
         service_parser = subparsers.add_parser("service", help="Service the compound")
         service_parser.add_argument("number_to_service", type=int, help="Compound ID")
 
-        create_parser = subparsers.add_parser("create",
+        compound_parser = subparsers.add_parser("compound",
                                               help="Creates compound with route from O to end station")
-        create_parser.add_argument("loco_number", type=int, help="Locomotive number")
-        create_parser.add_argument("coach_amount", type=int, help="Number of coaches")
-        create_parser.add_argument("end_station", type=str, help="End station name (start is always O)")
-        create_parser.add_argument("--time", type=int, default=480, help="Departure time in minutes")
-        create_parser.add_argument("--seats", type=int, default=10, help="Seats per coach")
-        create_parser.add_argument("--price", type=int, default=25, help="Seat price")
+        compound_parser.add_argument("loco_number", type=int, help="Locomotive number")
+        compound_parser.add_argument("coach_amount", type=int, help="Number of coaches")
+        compound_parser.add_argument("end_station", type=str, help="End station name (start is always O)")
+        compound_parser.add_argument("--time", type=int, default=480, help="Departure time in minutes")
+        compound_parser.add_argument("--seats", type=int, default=10, help="Seats per coach")
+        compound_parser.add_argument("--price", type=int, default=25, help="Seat price")
 
-        subparsers.add_parser("tick", help="Advance simulation time")
+        tick_parser = subparsers.add_parser("tick", help="Advance simulation time")
+        tick_parser.add_argument("--minutes", type=int, default=30, help="Minutes to advance")
         settime_parser = subparsers.add_parser("settime", help="Set simulation time manually")
         settime_parser.add_argument("time", type=int, help="Time in minutes")
         passenger_parser = subparsers.add_parser("passenger", help="Creates a passenger")

@@ -48,7 +48,7 @@ class Serializer:
             )
         data = {
             "global_state": {
-                "compound_id_counter": Compound._Compound__compound_id_counter
+                "compound_id_counter": Compound.get_id_counter()
             },
             "compounds": compounds_data,
             "timetable": timetable_data
