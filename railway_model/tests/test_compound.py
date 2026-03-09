@@ -1,13 +1,13 @@
 import pytest
 from compound.coach import Coach
-from compound.compound import Compound, TrainState, Route, Station
-from exceptions.exceptions import SeatError
-from exceptions.exceptions import CreatingEntityError
+from compound.compound import Compound, TrainState, Route
+from railway.station import Station
+from exceptions.exceptions import CreatingEntityError, InvalidStateError, SeatError
 from management.locomotive_manager import LocomotiveManager, Locomotive
 from railway.railway import Railway
 
 
-def test_coach():
+def test_coach_free_seats():
     number = 11
     seat_amount = 5
     seat_price = 26
@@ -28,6 +28,9 @@ def test_coach():
     assert coach.free_seats == [4, 5]
     coach.free_coach()
     assert coach.free_seats == [1, 2, 3, 4, 5]
+    with pytest.raises(SeatError):
+        coach.free_seat(-8)
+
 
 def test_locomotive():
     locomotive = Locomotive(34)
@@ -57,6 +60,7 @@ def test_compound():
     assert compound.state == TrainState.AT_STATION
     compound.process_station_actions()
     assert compound.state == TrainState.AT_STATION
+    compound.state = TrainState.MAINTENANCE
 
 
 

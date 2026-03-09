@@ -1,9 +1,7 @@
-import json
 from typing import List
-from pathlib import Path
 from compound.locomotive import Locomotive
 from compound.coach import Coach
-from railway.route import Route, Station
+from railway.route import Route
 from enums.enums import TrainState
 from exceptions.exceptions import InvalidStateError
 
@@ -13,7 +11,7 @@ class Compound:
 
     def __init__(self, locomotive: Locomotive, coaches: List[Coach], compound_id: int = None):
         self.locomotive = locomotive
-        self.coaches = sorted(coaches, key= lambda c: c.number)
+        self.coaches = sorted(coaches, key=lambda c: c.number)
         if compound_id is None:
             self.__compound_id = Compound.__compound_id_counter
             Compound.__compound_id_counter += 1
@@ -37,6 +35,7 @@ class Compound:
         self.coaches.sort(key=lambda c: c.number)
 
     def move_along_route(self, route: Route):
+        self.check_state()
         if self.state != TrainState.STOPPED and self.state != TrainState.AT_STATION:
             raise InvalidStateError("Cannot move from this state")
         self.state = TrainState.MOVING
@@ -60,5 +59,7 @@ class Compound:
         if not self.locomotive.check_state():
             self.state = TrainState.MAINTENANCE
         self.state = TrainState.STOPPED
+
+
 
 

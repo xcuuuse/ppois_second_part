@@ -13,14 +13,14 @@ class Route:
         path = []
         first_railway = self.railways[0]
         stations = list(first_railway.stations)
-        path.extend(stations)
+        start = next((s for s in stations if s.name == "O"), stations[0])
+        end = next(s for s in stations if s != start)
+        path.extend([start, end])
 
         for railway in self.railways[1:]:
             current_end = path[-1]
-            other_station = list(railway.stations)[0] if list(railway.stations)[0] != current_end\
-                else list(railway.stations)[1]
+            other_station = next(s for s in railway.stations if s != current_end)
             path.append(other_station)
-
         return path
 
     @property

@@ -9,4 +9,4 @@ class Ticket:
         self.seat_number = seat_number
 
     def __str__(self):
-        return f"Race {self.compound.compound_id}, {self.time}"
+        return f"Compound {self.compound.compound_id}, {self.time}"

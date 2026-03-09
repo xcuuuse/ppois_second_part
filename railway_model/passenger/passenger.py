@@ -4,15 +4,15 @@ from .ticket import Ticket
 
 
 class Passenger:
-    _id_counter = 1
+    id_counter = 1
 
     def __init__(self, name: str, finance: int):
         Validator.validate(locals(), {
             "name": (str, lambda s: s != ""),
             "finance": (int, lambda x: x >= 0)
         })
-        self.__passenger_id = Passenger._id_counter
-        Passenger._id_counter += 1
+        self.__passenger_id = Passenger.id_counter
+        Passenger.id_counter += 1
         self.__name = name
         self.__tickets: List[Ticket] = []
         self.__finance = finance
@@ -24,6 +24,10 @@ class Passenger:
     @property
     def tickets(self):
         return self.__tickets
+
+    @property
+    def name(self):
+        return self.__name
 
     @property
     def finance(self):

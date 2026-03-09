@@ -1,5 +1,6 @@
 from compound.compound import Compound
 from railway.route import Route
+from cli.timer import Timer
 
 
 class TimetableCell:
@@ -10,7 +11,7 @@ class TimetableCell:
 
     def __str__(self):
         return (f"The train {self.compound.compound_id}"
-                f"({self.route.stations[0]} - {self.route.stations[-1]}) departs at {self.time}.")
+                f"({self.route.stations[0]} - {self.route.stations[-1]}) departs at {Timer.format_time(self.time)}.")
 
     def __eq__(self, other):
         if isinstance(other, TimetableCell):

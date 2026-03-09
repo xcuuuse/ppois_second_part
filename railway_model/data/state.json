@@ -15,25 +15,36 @@
       "coaches": [
         {
           "number": 1,
-          "seats_amount": 5,
+          "seats_amount": 10,
           "seat_price": 25,
           "seats": {
             "1": null,
             "2": null,
             "3": null,
             "4": null,
-            "5": null
+            "5": null,
+            "6": null,
+            "7": null,
+            "8": null,
+            "9": null,
+            "10": null
           }
         },
         {
           "number": 2,
-          "seats_amount": 4,
-          "seat_price": 45,
+          "seats_amount": 10,
+          "seat_price": 25,
           "seats": {
             "1": null,
             "2": null,
             "3": null,
-            "4": null
+            "4": null,
+            "5": null,
+            "6": null,
+            "7": null,
+            "8": null,
+            "9": null,
+            "10": null
           }
         }
       ],
@@ -45,10 +56,10 @@
     {
       "compound_id": 1,
       "route": [
-        "A",
-        "O"
+        "O",
+        "3"
       ],
-      "time": 800
+      "time": 480
     }
   ]
 }

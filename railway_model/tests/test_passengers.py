@@ -4,7 +4,8 @@ from passenger.passenger import Passenger, Ticket
 from compound.compound import Compound, Locomotive, Coach
 from management.ticket_manager import TicketManager
 from management.timetable_manager import TimetableManager, TimetableCell, Timetable, TimetableError
-from railway.route import Route, Station, Railway
+from railway.route import Route, Railway
+from railway.station import Station
 
 
 def test_passenger():
@@ -23,6 +24,7 @@ def test_passenger():
     TicketManager.create_ticket(passenger, compound, coach2, 3, 800)
     with pytest.raises(TicketSellingError):
         TicketManager.create_ticket(passenger, compound, coach2, -1, 800)
+    with pytest.raises(TicketSellingError):
         TicketManager.create_ticket(passenger, compound, coach2, 4, 800)
 
 

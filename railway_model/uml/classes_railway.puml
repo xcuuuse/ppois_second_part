@@ -1,6 +1,40 @@
 @startuml
 set namespaceSeparator none
+class "Parser" as cli.Parser {
+  +{static} build_parser() -> ArgumentParser
+}
 
+class "Timer" as cli.Timer {
+  -{static} TIME_FILE : str = "data/time.json"
+  +{static} load_time() -> int
+  +{static} save_time(time: int) -> None
+  +{static} advance(minutes: int) -> int
+  +{static} set_time(time_hhmm: str) -> int
+  +{static} format_time(minutes: int) -> str
+  +{static} reset_time() -> None
+}
+
+class "Cli" as cli.Cli {
+  -{static} __create_compound(locomotive_number: int, coach_amount: int, seats: int, price: int) -> Compound
+  -{static} __find_cell_by_comp_id(timetable: Timetable, compound_id: int) -> TimetableCell
+  -{static} __check_timetable(timetable: Timetable, current_time: int) -> None
+  -{static} __get_cell(timetable: Timetable, compound_id: int) -> TimetableCell
+  -{static} __state(cell: TimetableCell) -> None
+  -{static} __move(cell: TimetableCell) -> None
+  -{static} __book(cell: TimetableCell, timetable: Timetable, parser) -> None
+  -{static} __service(cell: TimetableCell) -> None
+  -{static} __create(timetable: Timetable, args) -> None
+  -{static} __passenger(args) -> None
+  -{static} __set_time(time: int) -> None
+  +{static} cli() -> int
+}
+class "PassengerSerializer" as management.passenger_serializer.PassengerSerializer {
+  -{static} PASSENGERS_FILE : str = "data/passengers.json"
+  +{static} load_passengers(path: str) -> dict
+  +{static} save_passenger(passenger: Passenger, path: str) -> None
+  +{static} get_passenger(passenger_id: int, timetable: Timetable, path: str) -> Passenger
+  +{static} remove_tickets_for_compound(compound_id: int, path: str) -> None
+}
 class "Coach" as compound.Coach {
   -number : int
   -seat_price : int
@@ -50,18 +84,6 @@ class "LocomotiveManager" as management.locomotive_manager.LocomotiveManager {
   +check_locomotive(locomotive: Locomotive) -> None
 }
 
-
-class "RouteManager" as management.route_manager.RouteManager {
-  -route : Route
-  -compound : Compound
-  -timetable : Timetable
-  -time : int = 0
-  -running : bool = false
-  -timer_thread : Thread
-  +control_route_action() -> None
-  +start_timer() -> None
-  +stop_timer() -> None
-}
 
 class "TicketManager" as management.ticket_manager.TicketManager {
   {static} +create_ticket(passenger: Passenger,compound: Compound, coach: Coach, seat_number: int, time: int) -> None
@@ -122,6 +144,7 @@ class "Railway" as railway.Railway {
 }
 
 
+
 class "TicketSellingError" as exceptions.TicketSellingError {
   +__init__(message: str) -> None
 }
@@ -163,9 +186,6 @@ passenger.Ticket --> railway.Station : start
 passenger.Ticket --> railway.Station : end
 management.serializer.Serializer --> management.timetable.Timetable : serializer
 management.locomotive_manager.LocomotiveManager *--  compound.Locomotive : manages
-management.route_manager.RouteManager --> railway.Route : uses
-management.route_manager.RouteManager --> compound.Compound : controls
-management.route_manager.RouteManager --> management.timetable.Timetable :uses
 management.ticket_manager.TicketManager --> passenger.Passenger : uses
 management.ticket_manager.TicketManager --> compound.Compound : uses
 management.ticket_manager.TicketManager --> compound.Coach : uses
@@ -175,4 +195,20 @@ management.validator.Validator --> exceptions.CreatingEntityError : rai
 management.ticket_manager.TicketManager --> exceptions.TicketSellingError: uses
 locomotive.Locomotive --> exceptions.LocomotiveUsingError : raises
 management.timetable_manager.TimetableManager --> exceptions.TimetableError: uses
+management.passenger_serializer.PassengerSerializer --> passenger.Passenger : uses
+management.passenger_serializer.PassengerSerializer --> passenger.Ticket : uses
+management.passenger_serializer.PassengerSerializer --> management.timetable.Timetable : uses
+management.passenger_serializer.PassengerSerializer --> exceptions.TimetableError : raises
+cli.Cli --> management.passenger_serializer.PassengerSerializer : uses
+cli.Cli --> cli.Timer : uses
+cli.Cli --> cli.Parser : uses
+cli.Cli --> management.serializer.Serializer : uses
+cli.Cli --> management.passenger_serializer.PassengerSerializer : uses
+cli.Cli --> management.timetable_manager.TimetableManager : uses
+cli.Cli --> management.ticket_manager.TicketManager : uses
+cli.Cli --> management.timetable.Timetable : uses
+cli.Cli --> management.timetable.TimetableCell : uses
+cli.Timer --> exceptions.TimetableError : raises
+compound.Compound --> exceptions.InvalidStateError: raises
+compound.Coach --> exceptions.SeatError: raises
 @enduml

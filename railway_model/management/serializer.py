@@ -5,14 +5,15 @@ from compound.locomotive import Locomotive
 from compound.coach import Coach
 from enums.enums import TrainState
 from management.timetable import Timetable, TimetableCell
-from railway.route import Station, Railway, Route
+from railway.route import Railway, Route
+from railway.station import Station
 
 
 class Serializer:
-    STATE_FILE = "state.json"
+    STATE_FILE = "data/state.json"
 
     @staticmethod
-    def save(timetable: Timetable, path=STATE_FILE):
+    def save_state(timetable: Timetable, path=STATE_FILE):
         compounds_data = []
         for cell in timetable.cells:
             compound = cell.compound
@@ -56,10 +57,9 @@ class Serializer:
             json.dump(data, f, indent=2)
 
     @staticmethod
-    def load(path=STATE_FILE):
+    def load_state(path=STATE_FILE):
         if not Path(path).exists():
             raise FileNotFoundError("State file not found")
-
         with open(path, "r") as f:
             data = json.load(f)
         Compound._Compound__compound_id_counter = data["global_state"]["compound_id_counter"]
@@ -71,7 +71,6 @@ class Serializer:
             locomotive.is_usable = locomotive_data["is_usable"]
             locomotive.minimum_damage_level = locomotive_data["min_damage"]
             locomotive.maximum_damage_level = locomotive_data["max_damage"]
-
             coaches = []
             for coach_data in c_data["coaches"]:
                 coach = Coach(coach_data["number"], coach_data["seats_amount"], coach_data["seat_price"])
@@ -79,7 +78,6 @@ class Serializer:
                     if pid is not None:
                         coach.occupy_seat(int(seat), pid)
                 coaches.append(coach)
-
             compound = Compound(locomotive, coaches, c_data["compound_id"])
             compound._Compound__current_pos = c_data["current_pos"]
             compound.state = TrainState(c_data["state"])
@@ -92,9 +90,8 @@ class Serializer:
             for i in range(len(stations) - 1):
                 railways.append(Railway({stations[i], stations[i + 1]}, 100))
             route = Route(railways)
-
             compound = compounds[t_data["compound_id"]]
-
             cell = TimetableCell(compound, route, t_data["time"])
             timetable.cells.append(cell)
         return timetable
+

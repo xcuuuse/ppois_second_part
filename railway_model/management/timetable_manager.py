@@ -9,7 +9,7 @@ class TimetableManager:
     def add_cell(timetable: Timetable, cell: TimetableCell):
         if cell in timetable.cells:
             raise TimetableError("The error already exists")
-        timetable.cells.append(cell)
+        timetable.add_cell(cell)
         timetable.cells.sort(key=lambda t: t.time)
 
     @staticmethod
@@ -18,3 +18,6 @@ class TimetableManager:
             raise TimetableError("The cell doesn't exist")
         timetable.cells.remove(cell)
 
+    @staticmethod
+    def show_timetable(timetable: Timetable):
+        timetable.show_all()

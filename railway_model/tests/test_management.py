@@ -1,24 +1,17 @@
 import pytest
-import json
 import os
-from pathlib import Path
 from compound.compound import Compound
 from compound.locomotive import Locomotive
 from compound.coach import Coach
-from enums.enums import TrainState
 from management.timetable import Timetable, TimetableCell
-from railway.route import Station, Railway, Route
+from railway.route import Railway, Route
+from railway.station import Station
 from management.serializer import Serializer
-from passenger.passenger import Passenger
-from management.ticket_manager import TicketManager
 
 
 @pytest.fixture
 def temp_state_file(tmp_path):
-    file_path = tmp_path / "test_state.json"
-    yield str(file_path)
-    if os.path.exists(file_path):
-        os.remove(file_path)
+    return str(tmp_path / "test_state.json")
 
 
 @pytest.fixture
@@ -48,9 +41,9 @@ def sample_route():
 
 
 def test_serializer(temp_state_file, sample_timetable):
-    Serializer.save(sample_timetable, temp_state_file)
+    Serializer.save_state(sample_timetable, temp_state_file)
     assert os.path.exists(temp_state_file)
-    loaded_timetable = Serializer.load(temp_state_file)
+    loaded_timetable = Serializer.load_state(temp_state_file)
     assert len(loaded_timetable.cells) == 1
     loaded_cell = loaded_timetable.cells[0]
     original_cell = sample_timetable.cells[0]
