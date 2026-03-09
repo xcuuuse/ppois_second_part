@@ -3,4 +3,4 @@ pytest.ini
 **/__pycache__
 .pytest_cache/
 .coverage
-.idea
+**/.idea
