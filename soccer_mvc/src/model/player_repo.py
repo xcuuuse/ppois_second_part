@@ -1,0 +1,74 @@
+from sqlalchemy import or_, select, delete
+from .database import Session
+from .player import Player
+from typing import List
+
+
+class PlayerRepository:
+    def __init__(self):
+        self.session = Session()
+
+    def add(self, player: Player):
+        self.session.add(player)
+        self.session.commit()
+
+    def add_many(self, players: List[Player]):
+        self.session.add_all(players)
+        self.session.commit()
+
+    def search_by_name_date(self, last_name=None, first_name=None, patronymic=None, birth_date=None):
+        query = select(Player)
+        if last_name:
+            query = query.where(Player.last_name.ilike(f"%{last_name}%"))
+        if first_name:
+            query = query.where(Player.first_name.ilike(f"%{first_name}%"))
+        if patronymic:
+            query = query.where(Player.patronymic.ilike(f"%{patronymic}%"))
+        if birth_date:
+            query = query.where(Player.birth_date == birth_date)
+        return self.session.scalars(query).all()
+
+    def search_by_position_or_squad(self, position=None, squad=None):
+        conditions = []
+        query = select(Player)
+        if position:
+            conditions.append(Player.position == position)
+        if squad:
+            conditions.append(Player.squad == squad)
+        if conditions:
+            query = query.where(or_(*conditions))
+        return self.session.scalars(query).all()
+
+    def search_by_team_or_city(self, team=None, city=None):
+        conditions = []
+        query = select(Player)
+        if team:
+            conditions.append(Player.team == team)
+        if city:
+            conditions.append(Player.city == city)
+        if conditions:
+            query = query.where(or_(*conditions))
+        return self.session.scalars(query).all()
+
+    def delete_by_name_date(self, last_name=None, first_name=None, patronymic=None, birth_date=None):
+        query = delete(Player)
+
+        if last_name:
+            query = query.where(Player.last_name.ilike(f"%{last_name}%"))
+        if first_name:
+            query = query.where(Player.first_name.ilike(f"%{first_name}%"))
+        if patronymic:
+            query = query.where(Player.patronymic.ilike(f"%{patronymic}%"))
+        if birth_date:
+            query = query.where(Player.birth_date == birth_date)
+
+        result = self.session.execute(query)
+        self.session.commit()
+        return result.rowcount
+
+    def get_all(self):
+        return self.session.scalars(select(Player)).all()
+
+
+
+

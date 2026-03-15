@@ -56,6 +56,8 @@ def test_cli_state_compound_not_found():
     result = run_cli("state", "999")
     assert result == 1
 
+
 def test_now():
     result = run_cli("now")
     assert result == 0
+

@@ -1,7 +1,11 @@
 from cli.timer import Timer
 from cli.parser import Parser
 from passenger.passenger import Passenger
-from exceptions import exceptions
+from exceptions.exceptions import (
+    TimetableError,
+    SeatError,
+    CreatingEntityError
+)
 from pathlib import Path
 from railway.route import Route, Railway
 from management.serializer import Serializer
@@ -55,7 +59,7 @@ class Cli:
     def __get_cell(timetable: Timetable, compound_id: int) -> TimetableCell:
         cell = Cli.__find_cell_by_comp_id(timetable, compound_id)
         if not cell:
-            raise exceptions.TimetableError(f"Compound {compound_id} not found")
+            raise TimetableError(f"Compound {compound_id} not found")
         return cell
 
     @staticmethod
@@ -90,14 +94,14 @@ class Cli:
         compound = cell.compound
         route = cell.route
         if parser.coach < 1 or parser.coach > len(compound.coaches):
-            raise exceptions.SeatError(f"Coach {parser.coach} does not exist.")
+            raise SeatError(f"Coach {parser.coach} does not exist.")
         coach = compound.coaches[parser.coach - 1]
         if parser.seat not in coach.seats:
-            raise exceptions.SeatError(f"Seat {parser.seat} does not exist in coach {parser.coach}.")
+            raise SeatError(f"Seat {parser.seat} does not exist in coach {parser.coach}.")
         if parser.seat not in coach.free_seats:
-            raise exceptions.SeatError(f"Seat {parser.seat} in coach {parser.coach} is already occupied")
+            raise SeatError(f"Seat {parser.seat} in coach {parser.coach} is already occupied")
         if coach.seats[parser.seat] == parser.pass_id:
-            raise exceptions.SeatError(f"Passenger {parser.pass_id} already occupies seat {parser.seat}")
+            raise SeatError(f"Passenger {parser.pass_id} already occupies seat {parser.seat}")
         passenger = PassengerSerializer.get_passenger(parser.pass_id, timetable)
         TicketManager.create_ticket(passenger, compound, coach, parser.seat, cell.time)
         PassengerSerializer.save_passenger(passenger)
@@ -115,7 +119,7 @@ class Cli:
     def __create(timetable, args):
         for cell in timetable.cells:
             if cell.compound.locomotive.number == args.loco_number:
-                raise exceptions.CreatingEntityError(f"The locomotive {args.loco_number} is already occupied")
+                raise CreatingEntityError(f"The locomotive {args.loco_number} is already occupied")
         new_compound = Cli.__create_compound(
             locomotive_number=args.loco_number,
             coach_amount=args.coach_amount,
@@ -142,7 +146,7 @@ class Cli:
     def __set_time(time: int):
         current_time = Timer.load_time()
         if time <= current_time:
-            raise exceptions.TimetableError("You cant set time less than now")
+            raise TimetableError("You cant set time less than now")
         Timer.set_time(Timer.format_time(time))
         print(f"Time set to {Timer.format_time(time)} ({time} minutes after midnight)")
 
