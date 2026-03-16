@@ -66,8 +66,45 @@ class PlayerRepository:
         self.session.commit()
         return result.rowcount
 
+    def delete_by_position_or_squad(self, position=None, squad=None):
+        conditions = []
+        query = delete(Player)
+        if position:
+            conditions.append(Player.position == position)
+        if squad:
+            conditions.append(Player.squad == squad)
+        if conditions:
+            query = query.where(or_(*conditions))
+        result = self.session.execute(query)
+        self.session.commit()
+        return result.rowcount
+
+    def delete_by_team_or_city(self, team=None, city=None):
+        conditions = []
+        query = delete(Player)
+        if team:
+            conditions.append(Player.team == team)
+        if city:
+            conditions.append(Player.city == city)
+        if conditions:
+            query = query.where(or_(*conditions))
+        result = self.session.execute(query)
+        self.session.commit()
+        return result.rowcount
+
+    def get_page(self, page, per_page):
+        offset = (page - 1) * per_page
+        return self.session.scalars(select(Player).offset(offset).limit(per_page)).all()
+
     def get_all(self):
         return self.session.scalars(select(Player)).all()
+
+    def clear(self):
+        self.session.execute(delete(Player))
+        self.session.commit()
+
+
+
 
 
 
