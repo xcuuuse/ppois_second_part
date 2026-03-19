@@ -1,4 +1,4 @@
-from sqlalchemy import or_, select, delete
+from sqlalchemy import or_, select, delete, func
 from .database import Session
 from .player import Player
 from typing import List
@@ -65,6 +65,9 @@ class PlayerRepository:
         result = self.session.execute(query)
         self.session.commit()
         return result.rowcount
+
+    def count(self):
+        return self.session.scalar(select(func.count()).select_from(Player))
 
     def delete_by_position_or_squad(self, position=None, squad=None):
         conditions = []
