@@ -1,66 +1,17 @@
-from PyQt6.QtWidgets import \
-    (QMainWindow,
-     QWidget,
-     QVBoxLayout,
-     QHBoxLayout,
-     QPushButton,
-     QStackedWidget,
-     QTableWidget,
-     QTreeWidget,
-     QTableWidgetItem,
-     QTreeWidgetItem,
-     QHeaderView)
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem, QTreeWidgetItem, QDialog
+from .ui.main_window_ui import Ui_Players
+from src.controller.player_controller import PlayerController
+from .dialog_add import DialogAdd
 
 
-class MainWindow(QMainWindow):
-    def __init__(self, controller):
+class MainWindow(QMainWindow, Ui_Players):
+    def __init__(self, controller: PlayerController):
         super().__init__()
+        self.setupUi(self)
         self.controller = controller
-        self.setWindowTitle("Soccer Players")
-        self.resize(1000, 600)
-        central_wiget = QWidget()
-        self.setCentralWidget(central_wiget)
-        self.main_layout = QVBoxLayout()
-        central_wiget.setLayout(self.main_layout)
-        self._init_buttons()
-        self._init_view_area()
         self.button_tree_view.clicked.connect(self._tree_table_swap)
+        self.button_add.clicked.connect(self._open_add_dialog)
         self.refresh()
-
-    def _init_buttons(self):
-        button_layout = QHBoxLayout()
-        self.button_add = QPushButton("Добавить")
-        self.button_search = QPushButton("Поиск")
-        self.button_delete = QPushButton("Удалить")
-        self.button_save_xml = QPushButton("Сохранить в XML")
-        self.button_load_xml = QPushButton("Загрузить из XML")
-        self.button_tree_view = QPushButton("Показать дерево")
-
-        for button in [
-            self.button_add,
-            self.button_search,
-            self.button_delete,
-            self.button_save_xml,
-            self.button_load_xml,
-            self.button_tree_view
-        ]:
-            button_layout.addWidget(button)
-        self.main_layout.addLayout(button_layout)
-
-    def _init_view_area(self):
-        self.stacked_widget = QStackedWidget()
-        self.table = QTableWidget()
-        self.table.setColumnCount(8)
-        self.table.setHorizontalHeaderLabels(
-            ["Фамилия", "Имя", "Отчество", "Дата", "Команда", "Город", "Состав", "Позиция"])
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.tree = QTreeWidget()
-        self.tree.setHeaderLabel("Игроки")
-        self.stacked_widget.addWidget(self.table)
-        self.stacked_widget.addWidget(self.tree)
-        self.main_layout.addWidget(self.stacked_widget)
 
     def _fill_table(self, players):
         self.table.setRowCount(len(players))
@@ -84,6 +35,11 @@ class MainWindow(QMainWindow):
             QTreeWidgetItem(root, [f"Город: {player.city}"])
             QTreeWidgetItem(root, [f"Состав: {player.squad}"])
             QTreeWidgetItem(root, [f"Позиция: {player.position}"])
+
+    def _open_add_dialog(self):
+        dialog = DialogAdd(self.controller, parent=self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.refresh()
 
     def _tree_table_swap(self):
         if self.stacked_widget.currentIndex() == 0:
