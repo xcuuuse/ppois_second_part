@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QDialog, QMessageBox
-from PyQt6.QtCore import QDate
+from PyQt6.QtCore import QDate, Qt
 from .ui.dialog_add_ui import Ui_dialog_add
 from src.model.player import Player
 from src.controller.player_controller import PlayerController
@@ -9,10 +9,12 @@ class DialogAdd(QDialog, Ui_dialog_add):
     def __init__(self, controller: PlayerController, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.setFixedSize(300, 340) #не хочет чиниться
         self.controller = controller
 
         self.button_cancel.clicked.connect(self.reject)
         self.button_save.clicked.connect(self._save)
+
 
     def _save(self):
         last_name = self.input_last_name.text().strip()

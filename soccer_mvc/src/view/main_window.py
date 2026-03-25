@@ -2,15 +2,23 @@ from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem, QTreeWidgetItem, QDia
 from .ui.main_window_ui import Ui_Players
 from src.controller.player_controller import PlayerController
 from .dialog_add import DialogAdd
+from .paginator import Paginator
 
 
 class MainWindow(QMainWindow, Ui_Players):
     def __init__(self, controller: PlayerController):
         super().__init__()
         self.setupUi(self)
+        self.table.setColumnCount(8)
+        self.table.setHorizontalHeaderLabels([
+            "Фамилия", "Имя", "Отчество", "Дата",
+            "Команда", "Город", "Состав", "Позиция"
+        ])
         self.controller = controller
         self.button_tree_view.clicked.connect(self._tree_table_swap)
         self.button_add.clicked.connect(self._open_add_dialog)
+        self.paginator = Paginator(self.controller, self.refresh, parent=self)
+        self.verticalLayout.addWidget(self.paginator)
         self.refresh()
 
     def _fill_table(self, players):
@@ -53,3 +61,4 @@ class MainWindow(QMainWindow, Ui_Players):
         players, current_page, total_pages, total = self.controller.get_current_page()
         self._fill_table(players)
         self._fill_tree(players)
+        self.paginator.update_info(current_page, total_pages)

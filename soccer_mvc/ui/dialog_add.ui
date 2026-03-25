@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>dialog_add</class>
  <widget class="QDialog" name="dialog_add">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -10,9 +13,15 @@
     <height>340</height>
    </rect>
   </property>
-  <property name="maximumSize">
+  <property name="minimumSize">
    <size>
     <width>300</width>
+    <height>340</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
@@ -30,6 +39,9 @@
    <item>
     <widget class="QLineEdit" name="input_last_name">
      <property name="text">
+      <string/>
+     </property>
+     <property name="placeholderText">
       <string>Фамилия</string>
      </property>
     </widget>
@@ -37,6 +49,9 @@
    <item>
     <widget class="QLineEdit" name="input_first_name">
      <property name="text">
+      <string/>
+     </property>
+     <property name="placeholderText">
       <string>Имя</string>
      </property>
     </widget>
@@ -44,6 +59,9 @@
    <item>
     <widget class="QLineEdit" name="input_patronymic">
      <property name="text">
+      <string/>
+     </property>
+     <property name="placeholderText">
       <string>Отчество</string>
      </property>
     </widget>
@@ -56,6 +74,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
@@ -67,6 +88,9 @@
       </size>
      </property>
      <property name="text">
+      <string/>
+     </property>
+     <property name="placeholderText">
       <string>Команда</string>
      </property>
     </widget>
@@ -74,6 +98,9 @@
    <item>
     <widget class="QLineEdit" name="input_city">
      <property name="text">
+      <string/>
+     </property>
+     <property name="placeholderText">
       <string>Город</string>
      </property>
     </widget>
@@ -81,6 +108,9 @@
    <item>
     <widget class="QLineEdit" name="input_squad">
      <property name="text">
+      <string/>
+     </property>
+     <property name="placeholderText">
       <string>Состав</string>
      </property>
     </widget>
@@ -88,6 +118,9 @@
    <item>
     <widget class="QLineEdit" name="input_position">
      <property name="text">
+      <string/>
+     </property>
+     <property name="placeholderText">
       <string>Позиция</string>
      </property>
     </widget>

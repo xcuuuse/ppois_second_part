@@ -77,7 +77,11 @@
       <widget class="QWidget" name="page">
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QTableWidget" name="table"/>
+         <widget class="QTableWidget" name="table">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

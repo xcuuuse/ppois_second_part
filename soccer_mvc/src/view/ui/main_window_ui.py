@@ -48,6 +48,7 @@ class Ui_Players(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.page)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.table = QtWidgets.QTableWidget(parent=self.page)
+        self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.setObjectName("table")
         self.table.setColumnCount(0)
         self.table.setRowCount(0)
