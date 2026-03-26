@@ -1,5 +1,5 @@
 {
-  "id_counter": 7,
+  "id_counter": 8,
   "passengers": {
     "1": {
       "passenger_id": 1,
@@ -42,6 +42,12 @@
       "passenger_id": 6,
       "name": "name",
       "finance": 1000000000000,
+      "tickets": []
+    },
+    "7": {
+      "passenger_id": 7,
+      "name": "Passenger",
+      "finance": 500,
       "tickets": []
     }
   }

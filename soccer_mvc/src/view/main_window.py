@@ -3,6 +3,7 @@ from .ui.main_window_ui import Ui_Players
 from src.controller.player_controller import PlayerController
 from .dialog_add import DialogAdd
 from .paginator import Paginator
+from .dialog_search import DialogSearch
 
 
 class MainWindow(QMainWindow, Ui_Players):
@@ -16,12 +17,14 @@ class MainWindow(QMainWindow, Ui_Players):
         ])
         self.controller = controller
         self.button_tree_view.clicked.connect(self._tree_table_swap)
-        self.button_add.clicked.connect(self._open_add_dialog)
+        self.button_add.clicked.connect(self._add_dialog)
         self.paginator = Paginator(self.controller, self.refresh, parent=self)
         self.verticalLayout.addWidget(self.paginator)
+        self.button_search.clicked.connect(self._search_dialog)
         self.refresh()
 
     def _fill_table(self, players):
+        self.table.clearContents()
         self.table.setRowCount(len(players))
         for row, player in enumerate(players):
             self.table.setItem(row, 0, QTableWidgetItem(player.last_name))
@@ -44,7 +47,7 @@ class MainWindow(QMainWindow, Ui_Players):
             QTreeWidgetItem(root, [f"Состав: {player.squad}"])
             QTreeWidgetItem(root, [f"Позиция: {player.position}"])
 
-    def _open_add_dialog(self):
+    def _add_dialog(self):
         dialog = DialogAdd(self.controller, parent=self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.refresh()
@@ -56,6 +59,10 @@ class MainWindow(QMainWindow, Ui_Players):
         else:
             self.stacked_widget.setCurrentIndex(0)
             self.button_tree_view.setText("Показать дерево")
+
+    def _search_dialog(self):
+        dialog = DialogSearch(self.controller, parent=self)
+        dialog.exec()
 
     def refresh(self):
         players, current_page, total_pages, total = self.controller.get_current_page()

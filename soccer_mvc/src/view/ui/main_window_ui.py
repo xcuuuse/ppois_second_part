@@ -71,7 +71,7 @@ class Ui_Players(object):
 
     def retranslateUi(self, Players):
         _translate = QtCore.QCoreApplication.translate
-        Players.setWindowTitle(_translate("Players", "MainWindow"))
+        Players.setWindowTitle(_translate("Players", "Игроки"))
         self.button_add.setText(_translate("Players", "Добавить"))
         self.button_search.setText(_translate("Players", "Поиск"))
         self.button_remove.setText(_translate("Players", "Удалить"))

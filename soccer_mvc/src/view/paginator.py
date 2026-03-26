@@ -9,13 +9,14 @@ class Paginator(QWidget, Ui_Paginator):
         self.setupUi(self)
         self.controller = controller
         self.refresh = refresh
-        self.combo_per_page.addItems(["5", "10"])
+        self.combo_per_page.addItems(["3", "5", "10", "20"])
         self.combo_per_page.setCurrentText("5")
         self.button_first.clicked.connect(self._first)
         self.button_last.clicked.connect(self._last)
         self.button_next.clicked.connect(self._next)
         self.button_previous.clicked.connect(self._previous)
         self.combo_per_page.currentTextChanged.connect(self._change_per_page)
+        self.controller.players_per_page(int(self.combo_per_page.currentText()))
 
     def update_info(self, current_page, total_pages):
         self.label_page_info.setText(
