@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dialog_search</class>
- <widget class="QDialog" name="dialog_search">
+ <class>DialogSearch</class>
+ <widget class="QDialog" name="DialogSearch">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,9 +11,9 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Поиск</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QTabWidget" name="tab_widget">
      <property name="currentIndex">
@@ -65,19 +65,72 @@
       <attribute name="title">
        <string>Позиция или состав</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QLineEdit" name="input_position">
-         <property name="placeholderText">
+        <widget class="QLabel" name="label">
+         <property name="text">
           <string>Позиция</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="input_squad">
-         <property name="placeholderText">
+        <widget class="QComboBox" name="position_box">
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Голкипер</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Защитник</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Полузащитник</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Нападающий</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
           <string>Состав</string>
          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="squad_box">
+         <item>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Основной</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Резерв</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Молодежный</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

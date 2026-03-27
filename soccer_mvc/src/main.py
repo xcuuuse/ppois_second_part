@@ -1,8 +1,7 @@
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt6.QtWidgets import QApplication
 import sys
 from src.controller.player_controller import PlayerController
-from src.view.main_window import MainWindow
+from src.view.windows.main_window import MainWindow
 
 
 def main():

@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QDialog, QMessageBox
 from PyQt6.QtCore import QDate, Qt
-from .ui.dialog_add_ui import Ui_dialog_add
+from src.view.ui.dialog_add_ui import Ui_dialog_add
 from src.model.player import Player
 from src.controller.player_controller import PlayerController
 
@@ -23,8 +23,8 @@ class DialogAdd(QDialog, Ui_dialog_add):
         birth_date = self.input_date.date().toPyDate()
         team = self.input_team.text().strip()
         city = self.input_city.text().strip()
-        squad = self.input_squad.text().strip()
-        position = self.input_position.text().strip()
+        squad = self.box_squad.currentText() or None
+        position = self.box_position.currentText() or None
         if not all([last_name, first_name, team, city, squad, position]):
             QMessageBox.warning(self, "Ошибка", "Заполните все обязательные поля")
             return

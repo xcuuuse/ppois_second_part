@@ -1,9 +1,9 @@
 from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem, QTreeWidgetItem, QDialog
-from .ui.main_window_ui import Ui_Players
+from src.view.ui.main_window_ui import Ui_Players
 from src.controller.player_controller import PlayerController
-from .dialog_add import DialogAdd
-from .paginator import Paginator
-from .dialog_search import DialogSearch
+from src.view.windows.dialog_add import DialogAdd
+from src.view.windows.paginator import Paginator
+from src.view.windows.dialog_search import DialogSearch
 
 
 class MainWindow(QMainWindow, Ui_Players):

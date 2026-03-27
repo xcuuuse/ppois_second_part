@@ -1,11 +1,11 @@
 from PyQt6.QtWidgets import QDialog, QTableWidgetItem, QHeaderView, QMessageBox
-from .ui.dialog_search_ui import Ui_dialog_search
+from src.view.ui.dialog_search_ui import Ui_DialogSearch
 from src.controller.player_controller import PlayerController
 from src.model.player import Player
 from typing import List
 
 
-class DialogSearch(QDialog, Ui_dialog_search):
+class DialogSearch(QDialog, Ui_DialogSearch):
     def __init__(self, controller: PlayerController, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -43,16 +43,16 @@ class DialogSearch(QDialog, Ui_dialog_search):
             has_name = any([last_name, first_name, patronymic])
             has_date = birth_date is not None
             if not (has_name and has_date):
-                QMessageBox.warning(self, "Ошибка", "Введите имя и дату")
+                QMessageBox.warning(self, "Ошибка", "Введите имя или дату")
                 return
             results = self.controller.search_by_name_date(last_name, first_name, patronymic, birth_date)
         elif current_tab == 1:
-            position = self.input_position.text().strip() or None
-            squad = self.input_squad.text().strip() or None
-            results = self.controller.search_by_position_or_squad(position, squad)
+            position = self.position_box.currentText() or None
+            squad = self.squad_box.currentText() or None
             if not (position or squad):
                 QMessageBox.warning(self, "Ошибка", "Введите позицию или состав")
                 return
+            results = self.controller.search_by_position_or_squad(position, squad)
         else:
             team = self.input_team.text().strip() or None
             city = self.input_city.text().strip() or None

@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget
-from .ui.paginator_ui import Ui_Paginator
+from src.view.ui.paginator_ui import Ui_Paginator
 from src.controller.player_controller import PlayerController
 
 
