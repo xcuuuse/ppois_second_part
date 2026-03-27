@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem, QTreeWidgetItem, QDia
 from src.view.ui.main_window_ui import Ui_Players
 from src.controller.player_controller import PlayerController
 from src.view.windows.dialog_add import DialogAdd
+from src.view.windows.dialog_delete import DialogDelete
 from src.view.windows.paginator import Paginator
 from src.view.windows.dialog_search import DialogSearch
 
@@ -20,7 +21,8 @@ class MainWindow(QMainWindow, Ui_Players):
         self.button_add.clicked.connect(self._add_dialog)
         self.paginator = Paginator(self.controller, self.refresh, parent=self)
         self.verticalLayout.addWidget(self.paginator)
-        self.button_search.clicked.connect(self._search_dialog)
+        self.button_search.clicked.connect(self._dialog_search)
+        self.button_remove.clicked.connect(self._dialog_delete)
         self.refresh()
 
     def _fill_table(self, players):
@@ -60,9 +62,14 @@ class MainWindow(QMainWindow, Ui_Players):
             self.stacked_widget.setCurrentIndex(0)
             self.button_tree_view.setText("Показать дерево")
 
-    def _search_dialog(self):
+    def _dialog_search(self):
         dialog = DialogSearch(self.controller, parent=self)
         dialog.exec()
+
+    def _dialog_delete(self):
+        dialog = DialogDelete(self.controller, parent=self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.refresh()
 
     def refresh(self):
         players, current_page, total_pages, total = self.controller.get_current_page()

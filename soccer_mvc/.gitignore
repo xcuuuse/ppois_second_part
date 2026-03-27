@@ -3,4 +3,4 @@
 .idea/
 # временно
 src/players.db
-src/view/ui/dialog_delete_ui.py
+

@@ -15,7 +15,6 @@ class DialogAdd(QDialog, Ui_dialog_add):
         self.button_cancel.clicked.connect(self.reject)
         self.button_save.clicked.connect(self._save)
 
-
     def _save(self):
         last_name = self.input_last_name.text().strip()
         first_name = self.input_first_name.text().strip()
