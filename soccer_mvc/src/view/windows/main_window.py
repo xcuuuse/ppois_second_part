@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem, QTreeWidgetItem, QDialog
+from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem, QTreeWidgetItem, QDialog, QFileDialog
 from src.view.ui.main_window_ui import Ui_Players
 from src.controller.player_controller import PlayerController
 from src.view.windows.dialog_add import DialogAdd
@@ -23,6 +23,8 @@ class MainWindow(QMainWindow, Ui_Players):
         self.verticalLayout.addWidget(self.paginator)
         self.button_search.clicked.connect(self._dialog_search)
         self.button_remove.clicked.connect(self._dialog_delete)
+        self.button_save_to_xml.clicked.connect(self._save_to_xml)
+        self.button_load_from_xml.clicked.connect(self._load_from_xml)
         self.refresh()
 
     def _fill_table(self, players):
@@ -69,6 +71,17 @@ class MainWindow(QMainWindow, Ui_Players):
     def _dialog_delete(self):
         dialog = DialogDelete(self.controller, parent=self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.refresh()
+
+    def _save_to_xml(self):
+        filename, _ = QFileDialog.getSaveFileName(self, "Сохранить в XML", "", "XML Files (*.xml)")
+        if filename:
+            self.controller.save_to_xml(filename)
+
+    def _load_from_xml(self):
+        filename, _ = QFileDialog.getOpenFileName(self, "Загрузить из XML", "", "XML Files (*.xml)")
+        if filename:
+            self.controller.read_from_xml(filename)
             self.refresh()
 
     def refresh(self):
