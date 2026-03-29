@@ -18,15 +18,16 @@ class PlayerRepository:
 
     def search_by_name_date(self, last_name=None, first_name=None, patronymic=None, birth_date=None):
         query = select(Player)
-        if last_name:
-            query = query.where(Player.last_name.ilike(f"%{last_name}%"))
-        if first_name:
-            query = query.where(Player.first_name.ilike(f"%{first_name}%"))
-        if patronymic:
-            query = query.where(Player.patronymic.ilike(f"%{patronymic}%"))
         if birth_date:
             query = query.where(Player.birth_date == birth_date)
-        return self.session.scalars(query).all()
+        results = self.session.scalars(query).all()
+        if last_name:
+            results = [result for result in results if last_name.lower() in result.last_name.lower()]
+        if first_name:
+            results = [result for result in results if first_name.lower() in result.first_name.lower()]
+        if patronymic:
+            results = [result for result in results if patronymic.lower() in result.patronymic.lower()]
+        return results
 
     def search_by_position_or_squad(self, position=None, squad=None):
         conditions = []

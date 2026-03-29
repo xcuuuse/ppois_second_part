@@ -1,4 +1,4 @@
-from sqlalchemy import  Date
+from sqlalchemy import Date
 from datetime import date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from typing import Optional
