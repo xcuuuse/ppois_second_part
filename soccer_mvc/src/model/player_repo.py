@@ -41,15 +41,13 @@ class PlayerRepository:
         return self.session.scalars(query).all()
 
     def search_by_team_or_city(self, team=None, city=None):
-        conditions = []
         query = select(Player)
+        results = self.session.scalars(query).all()
         if team:
-            conditions.append(Player.team == team)
+            results = [result for result in results if team.lower() in result.team.lower()]
         if city:
-            conditions.append(Player.city == city)
-        if conditions:
-            query = query.where(or_(*conditions))
-        return self.session.scalars(query).all()
+            results = [result for result in results if city.lower() in result.city.lower()]
+        return results
 
     def delete_by_name_date(self, last_name=None, first_name=None, patronymic=None, birth_date=None):
         query = delete(Player)
