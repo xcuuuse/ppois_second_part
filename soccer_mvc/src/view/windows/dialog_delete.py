@@ -14,6 +14,7 @@ class DialogDelete(QDialog, Ui_DialogDelete):
 
     def _delete(self):
         current_tab = self.tab_widget.currentIndex()
+        amount = self.controller.get_total()
         if current_tab == 0:
             last_name = self.input_last_name.text().strip() or None
             first_name = self.input_first_name.text().strip() or None
@@ -40,4 +41,4 @@ class DialogDelete(QDialog, Ui_DialogDelete):
                 return
             self.controller.delete_by_team_or_city(team, city)
         self.accept()
-
+        QMessageBox.information(self, "Удаление", f"Удалено записей: {amount - self.controller.get_total()}")

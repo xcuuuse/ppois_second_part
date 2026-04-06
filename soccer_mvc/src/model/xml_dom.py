@@ -10,7 +10,6 @@ class XMLDom:
 
         for player in players:
             player_el = doc.createElement("player")
-
             fields = {
                 "last_name": player.last_name,
                 "first_name": player.first_name,
@@ -21,13 +20,10 @@ class XMLDom:
                 "squad": player.squad,
                 "position": player.position
             }
-
             for key, value in fields.items():
                 element = doc.createElement(key)
                 element.appendChild(doc.createTextNode(value))
                 player_el.appendChild(element)
-
             root.appendChild(player_el)
-
         with open(filename, "w", encoding="utf-8") as file:
             doc.writexml(file, indent="  ", addindent="  ", newl="\n")

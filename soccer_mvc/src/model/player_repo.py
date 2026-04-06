@@ -53,7 +53,6 @@ class PlayerRepository:
 
     def delete_by_name_date(self, last_name=None, first_name=None, patronymic=None, birth_date=None):
         query = delete(Player)
-
         if last_name:
             query = query.where(Player.last_name.ilike(f"%{last_name}%"))
         if first_name:
@@ -62,7 +61,6 @@ class PlayerRepository:
             query = query.where(Player.patronymic.ilike(f"%{patronymic}%"))
         if birth_date:
             query = query.where(Player.birth_date == birth_date)
-
         result = self.session.execute(query)
         self.session.commit()
         return result.rowcount
@@ -106,7 +104,7 @@ class PlayerRepository:
     def clear(self):
         self.session.execute(delete(Player))
         self.session.commit()
-#what
+
 
 
 
