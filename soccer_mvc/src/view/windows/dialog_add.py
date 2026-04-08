@@ -38,5 +38,8 @@ class DialogAdd(QDialog, Ui_dialog_add):
             squad=squad,
             position=position
         )
-        self.controller.add_player_to_database(player)
-        self.accept()
+        try:
+            self.controller.add_player_to_database(player)
+            self.accept()
+        except ValueError as e:
+            QMessageBox.warning(self, "Ошибка", str(e))

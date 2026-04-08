@@ -1,11 +1,11 @@
 import pygame
 import sys
-
+from common.board import Board
 FPS = 30
 
 
 def main():
-    pygame.init()
+    """pygame.init()
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("Jewel Quest")
     timer = pygame.time.Clock()
@@ -17,7 +17,14 @@ def main():
                 pygame.quit()
                 sys.exit()
         screen.fill((70, 130, 180))
-        pygame.display.flip()
+        pygame.display.flip()"""
+    board = Board(5, 4)
+    board.fill()
+    board.print_board()
+    row, column = int(input()), int(input())
+    swap, swap1 = int(input()), int(input())
+    board.swap(row, column, swap, swap1)
+    board.print_board()
 
 
 if __name__ == "__main__":

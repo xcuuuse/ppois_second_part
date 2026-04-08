@@ -39,9 +39,17 @@ class PlayerController:
 
     def players_per_page(self, per_page: int):
         self.__per_page = per_page
-        self.__current_page = 1 # хз насчет этого
+        self.__current_page = 1
 
     def add_player_to_database(self, player: Player):
+        rules = [
+            all(f.isalpha() or f == '-' and player.first_name[-1] != '-' for f in player.first_name),
+            all(l.isalpha() or l == '-' and player.last_name[-1] != '-' for l in player.last_name),
+        ]
+        if player.patronymic:
+            rules.append(all(p.isalpha() for p in player.patronymic))
+        if not all(rules):
+            raise ValueError("Неправильно заполнено ФИО")
         self.__repo.add(player)
 
     def add_many_players(self, players: List[Player]):
@@ -72,7 +80,7 @@ class PlayerController:
         players = self.__repo.get_all()
         XMLDom.save_to_xml(players, filename)
 
-    def read_from_xml(self, filename):
+    def load_from_xml(self, filename):
         players = XMLSax.load_from_xml(filename)
         self.__repo.clear()
         self.__repo.add_many(players)

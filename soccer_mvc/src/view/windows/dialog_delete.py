@@ -1,6 +1,5 @@
 from src.view.ui.dialog_delete_ui import Ui_DialogDelete
 from PyQt6.QtWidgets import QDialog, QMessageBox
-from PyQt6.QtCore import QDate, Qt
 from src.controller.player_controller import PlayerController
 
 
@@ -11,6 +10,7 @@ class DialogDelete(QDialog, Ui_DialogDelete):
         self.controller = controller
         self.date_box.toggled.connect(self.input_date.setEnabled)
         self.button_delete.clicked.connect(self._delete)
+        self.setFixedSize(521, 354)
 
     def _delete(self):
         current_tab = self.tab_widget.currentIndex()

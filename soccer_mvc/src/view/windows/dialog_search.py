@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QDialog, QTableWidgetItem, QHeaderView, QMessageBox
+from PyQt6.QtCore import Qt
 from src.view.ui.dialog_search_ui import Ui_DialogSearch
 from src.controller.player_controller import PlayerController
 from src.model.player import Player
@@ -13,12 +14,13 @@ class DialogSearch(QDialog, Ui_DialogSearch):
         self.table_results.setColumnCount(8)
         self.table_results.setHorizontalHeaderLabels(["Фамилия", "Имя", "Отчество", "Дата",
             "Команда", "Город", "Состав", "Позиция"])
+        self.setWindowFlags(Qt.WindowType.Dialog)
         self.table_results.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table_results.setEditTriggers(self.table_results.EditTrigger.NoEditTriggers)
         self.input_date.setEnabled(False)
         self.check_date.toggled.connect(self.input_date.setEnabled)
         self.button_search.clicked.connect(self._search)
-
+        self.setFixedSize(563, 751)
     def _fill_results(self, players: List[Player]):
 
         self.label_results.setText(f"Найдено записей {len(players)}")

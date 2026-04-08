@@ -81,7 +81,7 @@ class MainWindow(QMainWindow, Ui_Players):
     def _load_from_xml(self):
         filename, _ = QFileDialog.getOpenFileName(self, "Загрузить из XML", "", "XML Files (*.xml)")
         if filename:
-            self.controller.read_from_xml(filename)
+            self.controller.load_from_xml(filename)
             self.refresh()
 
     def refresh(self):
