@@ -24,8 +24,12 @@ class Board:
             return False
         self.field[row][column], self.field[new_row][new_column] = (
             self.field[new_row][new_column], self.field[row][column])
-        self.find_matches()
-        self.drop_jewels()
+        if not self.remove_matches():
+            self.field[row][column], self.field[new_row][new_column] = (
+                self.field[new_row][new_column], self.field[row][column])
+            return False
+        self.process()
+        return True
 
     def find_matches(self):
         to_remove = set()
@@ -33,16 +37,21 @@ class Board:
             for j in range(self.column - 2):
                 if self.field[i][j] == self.field[i][j + 1] == self.field[i][j + 2]:
                     to_remove.add((i, j))
-                    to_remove.add((i, j+1))
-                    to_remove.add((i, j+2))
+                    to_remove.add((i, j + 1))
+                    to_remove.add((i, j + 2))
         for i in range(self.row - 2):
             for j in range(self.column):
                 if self.field[i][j] == self.field[i + 1][j] == self.field[i + 2][j]:
                     to_remove.add((i, j))
                     to_remove.add((i + 1, j))
                     to_remove.add((i + 2, j))
+        return to_remove
+
+    def remove_matches(self):
+        to_remove = self.find_matches()
         for i, j in to_remove:
             self.field[i][j] = None
+        return len(to_remove)
 
     def print_board(self):
         for i in range(self.row):
@@ -58,4 +67,18 @@ class Board:
             for i in range(self.row):
                 self.field[i][j] = new_column[i]
 
+    def fill_empty(self):
+        for i in range(self.row):
+            for j in range(self.column):
+                if self.field[i][j] is None:
+                    self.field[i][j] = random.choice(JEWEL_TYPES)
+
+    def process(self):
+        while True:
+            matches = self.find_matches()
+            if not matches:
+                break
+            self.remove_matches()
+            self.drop_jewels()
+            self.fill_empty()
 

@@ -1,30 +1,36 @@
 import pygame
 import sys
-from common.board import Board
+
+from src.common.board import Board
+from src.renderer.renderer import Renderer
 FPS = 30
+CELL_SIZE = 64
 
 
 def main():
-    """pygame.init()
-    screen = pygame.display.set_mode((800, 600))
-    pygame.display.set_caption("Jewel Quest")
-    timer = pygame.time.Clock()
-
+    board = Board(5, 5)
+    board.fill()
+    clock = pygame.time.Clock()
+    renderer = Renderer(board)
+    selected = None
     while True:
-        timer.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        screen.fill((70, 130, 180))
-        pygame.display.flip()"""
-    board = Board(5, 4)
-    board.fill()
-    board.print_board()
-    row, column = int(input()), int(input())
-    swap, swap1 = int(input()), int(input())
-    board.swap(row, column, swap, swap1)
-    board.print_board()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                column = x // CELL_SIZE
+                row = y // CELL_SIZE
+                if selected is None:
+                    selected = (row, column)
+                else:
+                    board.swap(selected[0], selected[1], row, column)
+                    selected = None
+            if event.type == pygame.K_ESCAPE:
+                selected = None
+        renderer.draw(selected)
+        clock.tick(FPS)
 
 
 if __name__ == "__main__":
