@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QWidget
 from src.view.ui.paginator_ui import Ui_Paginator
 from src.controller.player_controller import PlayerController
+from abc import ABC, abstractmethod
 
 
 class Paginator(QWidget, Ui_Paginator):
@@ -48,7 +49,9 @@ class Paginator(QWidget, Ui_Paginator):
 
 
 
-
-
+class Class(ABC):
+    @abstractmethod
+    def metod(self):
+        pass
 
 

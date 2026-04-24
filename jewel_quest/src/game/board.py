@@ -1,5 +1,5 @@
 import random
-JEWEL_TYPES = ["R", "G", "B", "Y", "P"]
+from src.common.jewel import JEWEL
 
 
 class Board:
@@ -16,7 +16,7 @@ class Board:
                     forbidden.add(self.field[i][j - 1])
                 if i >= 2 and self.field[i - 1][j] == self.field[i - 2][j]:
                     forbidden.add(self.field[i - 1][j])
-                choices = [t for t in JEWEL_TYPES if t not in forbidden]
+                choices = [t for t in JEWEL if t not in forbidden]
                 self.field[i][j] = random.choice(choices)
 
     def swap(self, row: int, column: int, new_row: int, new_column: int):
@@ -71,7 +71,7 @@ class Board:
         for i in range(self.row):
             for j in range(self.column):
                 if self.field[i][j] is None:
-                    self.field[i][j] = random.choice(JEWEL_TYPES)
+                    self.field[i][j] = random.choice(list(JEWEL))
 
     def process(self):
         while True:

@@ -1,5 +1,4 @@
 from PyQt6.QtWidgets import QDialog, QMessageBox
-from PyQt6.QtCore import QDate, Qt
 from src.view.ui.dialog_add_ui import Ui_dialog_add
 from src.model.player import Player
 from src.controller.player_controller import PlayerController

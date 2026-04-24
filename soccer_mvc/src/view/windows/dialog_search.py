@@ -15,12 +15,12 @@ class DialogSearch(QDialog, Ui_DialogSearch):
         self.table_results.setHorizontalHeaderLabels(["Фамилия", "Имя", "Отчество", "Дата",
             "Команда", "Город", "Состав", "Позиция"])
         self.setWindowFlags(Qt.WindowType.Dialog)
-        self.table_results.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table_results.setEditTriggers(self.table_results.EditTrigger.NoEditTriggers)
         self.input_date.setEnabled(False)
         self.check_date.toggled.connect(self.input_date.setEnabled)
         self.button_search.clicked.connect(self._search)
         self.setFixedSize(563, 751)
+
     def _fill_results(self, players: List[Player]):
 
         self.label_results.setText(f"Найдено записей {len(players)}")
