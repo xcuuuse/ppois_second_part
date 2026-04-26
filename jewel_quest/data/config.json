@@ -16,5 +16,11 @@
     "time_limit": 120,
     "score_limit": 1200,
     "points_per_jewel": 10
+  },
+  "audio": {
+    "music_volume": 0.5,
+    "click_volume": 0.1,
+    "menu_music": "assets/audio/zero.wav",
+    "sound": "assets/audio/untitled.wav"
   }
 }

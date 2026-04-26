@@ -74,7 +74,6 @@ class Reference:
     def draw(self, screen):
         screen.fill((30, 20, 50))
         pygame.draw.rect(screen, (150, 120, 200), self.reference_rect, width=2, border_radius=12)
-        mouse_pos = pygame.mouse.get_pos()
         title = self.font_title.render("JEWEL QUEST", True, (255, 255, 255))
         lines = [
             "Меняйте местами соседние камни",
@@ -89,6 +88,7 @@ class Reference:
             screen.blit(text, text.get_rect(center=(self.width // 2, 180 + i * 50)))
         screen.blit(title, title.get_rect(center=(self.width // 2, 60)))
 
+
 class Menu:
     def __init__(self, config: Config):
         self.config = config
@@ -96,6 +96,8 @@ class Menu:
         self.width = screen_config["width"]
         self.height = screen_config["height"]
         self.title = config.get("title")
+        self.audio_config = config.get("audio")
+        self.click_sound = pygame.mixer.Sound(self.audio_config["sound"])
         self.font_title = pygame.font.Font(None, 72)
         self.font_button = pygame.font.Font(None, 42)
         items = [
@@ -116,6 +118,9 @@ class Menu:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
+            click_sound = pygame.mixer.Sound(self.audio_config["sound"])
+            click_sound.set_volume(self.audio_config["click_volume"])
+            click_sound.play()
             for text, action, rect in self.buttons:
                 if rect.collidepoint(event.pos):
                     return action
