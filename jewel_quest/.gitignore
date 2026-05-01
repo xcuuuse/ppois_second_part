@@ -1,4 +1,6 @@
 .venv/
 .idea/
 **__pycache__/
+#временно
 data/leaderboard.json
+src/game/game.py

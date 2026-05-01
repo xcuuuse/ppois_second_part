@@ -41,7 +41,6 @@ class ConfirmDialog:
 
         mouse_pos = pygame.mouse.get_pos()
 
-        # кнопка Да
         yes_color = (80, 60, 120) if self.yes_rect.collidepoint(mouse_pos) else (60, 45, 100)
         pygame.draw.rect(screen, yes_color, self.yes_rect, border_radius=8)
         pygame.draw.rect(screen, (150, 120, 200), self.yes_rect, 2, border_radius=8)
@@ -64,6 +63,7 @@ class Reference:
         self.reference_rect = pygame.Rect(self.width, self.height, dw, dh)
         self.font_title = pygame.font.Font(None, 72)
         self.font_text = pygame.font.Font(None, 50)
+        self.font_hint = pygame.font.Font(None, 40)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -81,7 +81,7 @@ class Reference:
             "Режим 1: успей набрать очки за время.",
             "Режим 2: пройди уровни по целям.",
         ]
-        hint = self.font_text.render("Нажмите ESC для выхода в меню", True, (150, 150, 150))
+        hint = self.font_hint.render("Нажмите ESC для выхода в меню", True, (150, 150, 150))
         screen.blit(hint, hint.get_rect(center=(self.width // 2, self.height - 40)))
         for i, line in enumerate(lines):
             text = self.font_text.render(line, True, (200, 200, 200))
@@ -104,7 +104,6 @@ class Menu:
             ("Начать игру", "start"),
             ("Таблица рекордов", "records"),
             ("Справка", "help"),
-            ("Настройки", "settings"),
             ("Выход", "exit"),
         ]
         button_w, button_h = 300, 55
@@ -140,5 +139,50 @@ class Menu:
             label = self.font_button.render(text, True, (255, 255, 255))
             label_rect = label.get_rect(center=rect.center)
             screen.blit(label, label_rect)
+
+
+class ModeSelect:
+    def __init__(self, config: Config):
+        screen_config = config.get("screen")
+        self.width = screen_config["width"]
+        self.height = screen_config["height"]
+        self.font_title = pygame.font.Font(None, 62)
+        self.font_text = pygame.font.Font(None, 40)
+        self.font_button = pygame.font.Font(None, 42)
+        items = [
+            ("На время", "time"),
+            ("По очкам", "score"),
+        ]
+        button_width, button_height = 300, 50
+        start_y = self.height // 2 - (len(items) * (button_height + 15)) // 2
+        self.buttons = []
+        for i, (text, action) in enumerate(items):
+            x = self.width // 2 - button_width // 2
+            y = start_y + i * (button_height + 15)
+            rectangle = pygame.Rect(x, y, button_width, button_height)
+            self.buttons.append((text, action, rectangle))
+
+    def draw(self, screen):
+        screen.fill((30, 20, 50))
+        title = self.font_title.render("Начать игру", True, (255, 255, 255))
+        screen.blit(title, title.get_rect(center=(self.width // 2, self.height // 5)))
+        mouse_pos = pygame.mouse.get_pos()
+        hint = self.font_text.render("Нажмите ESC для выхода в меню", True, (150, 150, 150))
+        screen.blit(hint, hint.get_rect(center=(self.width // 2, self.height - 40)))
+        for text, action, rect in self.buttons:
+            color = (80, 60, 120) if rect.collidepoint(mouse_pos) else (50, 40, 90)
+            pygame.draw.rect(screen, color, rect, border_radius=10)
+            pygame.draw.rect(screen, (150, 120, 200), rect, 2, border_radius=10)
+            label = self.font_button.render(text, True, (255, 255, 255))
+            screen.blit(label, label.get_rect(center=rect.center))
+
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            return "back"
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for text, action, rect in self.buttons:
+                if rect.collidepoint(event.pos):
+                    return action
+        return None
 
 

@@ -37,7 +37,8 @@ class LeaderBoardScreen:
         dw, dh = 400, 200
         self.leaderboard_rect = pygame.Rect(self.width, self.height, dw, dh)
         self.font_title = pygame.font.Font(None, 72)
-        self.font_text = pygame.font.Font(None, 50)
+        self.font_text = pygame.font.Font(None, 60)
+        self.font_hint = pygame.font.Font(None, 40)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -57,5 +58,5 @@ class LeaderBoardScreen:
                 line = f"{i + 1}.  {record['name']}  —  {record['score']}"
                 text = self.font_text.render(line, True, (255, 255, 255))
                 screen.blit(text, text.get_rect(center=(self.width // 2, 150 + i * 55)))
-        hint = self.font_text.render("Нажмите ESC для выхода", True, (150, 150, 150))
+        hint = self.font_hint.render("Нажмите ESC для выхода в меню", True, (150, 150, 150))
         screen.blit(hint, hint.get_rect(center=(self.width // 2, self.height - 40)))

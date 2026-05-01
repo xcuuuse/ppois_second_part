@@ -1,12 +1,14 @@
 import pygame
 from src.game.config import Config
-from src.game.menu import Menu, ConfirmDialog, Reference
+from src.game.menu import Menu, ConfirmDialog, Reference, ModeSelect
 from src.game.leaderboard import LeaderBoardScreen, LeaderBoard
+from src.game.game import Game
 
 
 def main():
     pygame.init()
     config = Config()
+    game = None
     audio_config = config.get("audio")
     pygame.mixer.init()
     pygame.mixer.music.load(audio_config["menu_music"])
@@ -26,20 +28,39 @@ def main():
     show_leaderboard = False
     running = True
     lead = LeaderBoardScreen(config, leaderboard)
+    mode_select = ModeSelect(config)
+    show_mode_select = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if state == "menu" and not show_dialog and not show_help and not show_leaderboard:
+            if state == "menu" and not (
+                show_mode_select or
+                show_leaderboard or
+                show_help or
+                show_dialog
+            ):
                 action = menu.handle_event(event)
                 if action == "exit":
                     show_dialog = True
                 if action == "start":
-                    print("x")
+                    show_mode_select = True
                 if action == "help":
                     show_help = True
                 if action == "records":
                     show_leaderboard = True
+            if show_mode_select:
+                result = mode_select.handle_event(event)
+                if result == "back":
+                    show_mode_select = False
+                elif result == "time":
+                    game = Game(config, "time")
+                    state = "game"
+                    show_mode_select = False
+                elif result == "score":
+                    game = Game(config, "score")
+                    state = "game"
+                    show_mode_select = False
             elif show_dialog:
                 result = dialog.handle_event(event)
                 if result == True:
@@ -54,14 +75,25 @@ def main():
                 result = lead.handle_event(event)
                 if result == True:
                     show_leaderboard = False
+            elif state == "game":
+                game.handle_event(event)
         if state == "menu":
             menu.draw(screen)
-        if show_dialog:
+        if show_mode_select:
+            mode_select.draw(screen)
+        elif show_dialog:
             dialog.draw(screen)
-        if show_help:
+        elif show_help:
             ref.draw(screen)
-        if show_leaderboard:
+        elif show_leaderboard:
             lead.draw(screen)
+        elif state == "game":
+            game.draw(screen)
+        else:
+            menu.draw(screen)
+
+
+
         pygame.display.flip()
         clock.tick(screen_config["fps"])
 
