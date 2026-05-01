@@ -88,6 +88,7 @@ def main():
         elif show_leaderboard:
             lead.draw(screen)
         elif state == "game":
+            game.update()
             game.draw(screen)
         else:
             menu.draw(screen)

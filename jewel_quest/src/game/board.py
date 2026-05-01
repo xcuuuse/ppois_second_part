@@ -24,12 +24,13 @@ class Board:
             return False
         self.field[row][column], self.field[new_row][new_column] = (
             self.field[new_row][new_column], self.field[row][column])
-        if not self.remove_matches():
+        removed = self.remove_matches()
+        if not removed:
             self.field[row][column], self.field[new_row][new_column] = (
                 self.field[new_row][new_column], self.field[row][column])
             return False
         self.process()
-        return True
+        return removed
 
     def find_matches(self):
         to_remove = set()
