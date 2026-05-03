@@ -186,3 +186,41 @@ class ModeSelect:
         return None
 
 
+class DifficultySelect:
+    def __init__(self, config):
+        screen_config = config.get("screen")
+        self.width = screen_config["width"]
+        self.height = screen_config["height"]
+        self.font_title = pygame.font.Font(None, 62)
+        self.font_button = pygame.font.Font(None, 42)
+        levels = config.get("levels")
+        button_w, button_h = 300, 55
+        start_y = self.height // 2 - (len(levels) * (button_h + 15)) // 2
+        self.buttons = []
+        for i, level in enumerate(levels):
+            x = self.width // 2 - button_w // 2
+            y = start_y + i * (button_h + 15)
+            rect = pygame.Rect(x, y, button_w, button_h)
+            self.buttons.append((level["name"], level, rect))
+
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            return "back"
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for name, level, rect in self.buttons:
+                if rect.collidepoint(event.pos):
+                    return level
+        return None
+
+    def draw(self, screen):
+        screen.fill((30, 20, 50))
+        title = self.font_title.render("Выберите сложность", True, (255, 220, 80))
+        screen.blit(title, title.get_rect(center=(self.width // 2, self.height // 5)))
+        mouse_pos = pygame.mouse.get_pos()
+        for name, level, rect in self.buttons:
+            color = (80, 60, 120) if rect.collidepoint(mouse_pos) else (50, 40, 90)
+            pygame.draw.rect(screen, color, rect, border_radius=10)
+            pygame.draw.rect(screen, (150, 120, 200), rect, 2, border_radius=10)
+            label = self.font_button.render(name, True, (255, 255, 255))
+            screen.blit(label, label.get_rect(center=rect.center))
+

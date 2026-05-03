@@ -4,3 +4,4 @@
 #временно
 data/leaderboard.json
 src/game/game.py
+main.py
