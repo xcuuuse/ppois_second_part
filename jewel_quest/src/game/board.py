@@ -28,7 +28,7 @@ class Board:
         if not removed:
             self.field[row][column], self.field[new_row][new_column] = (
                 self.field[new_row][new_column], self.field[row][column])
-            return False
+            return 0
         self.process()
         return removed
 
@@ -36,13 +36,13 @@ class Board:
         to_remove = set()
         for i in range(self.row):
             for j in range(self.column - 2):
-                if self.field[i][j] == self.field[i][j + 1] == self.field[i][j + 2]:
+                if self.field[i][j] is not None and self.field[i][j] == self.field[i][j + 1] == self.field[i][j + 2]:
                     to_remove.add((i, j))
                     to_remove.add((i, j + 1))
                     to_remove.add((i, j + 2))
         for i in range(self.row - 2):
             for j in range(self.column):
-                if self.field[i][j] == self.field[i + 1][j] == self.field[i + 2][j]:
+                if self.field[i][j] is not None and self.field[i][j] == self.field[i + 1][j] == self.field[i + 2][j]:
                     to_remove.add((i, j))
                     to_remove.add((i + 1, j))
                     to_remove.add((i + 2, j))

@@ -167,7 +167,14 @@ class Game:
             drop_progress = min(1.0, (now - self.drop_start) / self.drop_duration)
             if drop_progress >= 1.0:
                 self.drop_offsets = {}
-                self.anim_state = "idle"
+                matches = self.board.find_matches()
+                if matches:
+                    self.removing = matches
+                    self.remove_start = pygame.time.get_ticks()
+                    self.anim_state = "removing"
+                    self.score += len(matches) * self.points_per_jewel
+                else:
+                    self.anim_state = "idle"
 
     def get_cell(self, mouse_x, mouse_y):
         col = (mouse_x - self.offset_x) // self.cell_size
