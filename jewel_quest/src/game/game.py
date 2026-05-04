@@ -36,6 +36,12 @@ class Game:
         self.swap_from = None
         self.swap_to = None
         self.anim_duration = 200
+        self.removing = set()
+        self.remove_start = 0
+        self.remove_duration = 300
+        self.drop_offsets = {}
+        self.drop_start = 0
+        self.drop_duration = 250
 
     def draw(self, screen):
         screen.fill((20, 15, 40))
@@ -58,36 +64,69 @@ class Game:
                     elif (i, j) == (r2, c2):
                         dx = (c1 - c2) * self.cell_size * progress
                         dy = (r1 - r2) * self.cell_size * progress
+                if self.anim_state == "dropping" and (i, j) in self.drop_offsets:
+                    drop_progress = min(1.0, (now - self.drop_start) / self.drop_duration)
+                    cells = self.drop_offsets[(i, j)]
+                    dy = -cells * self.cell_size * (1.0 - drop_progress)
                 color = jewel.value
                 padding = 6
-                rect = pygame.Rect(x+dx+padding, y+dy+padding, self.cell_size - padding * 2, self.cell_size - padding * 2)
+                if self.anim_state == "removing" and (i, j) in self.removing:
+                    remove_progress = min(1.0, (now - self.remove_start) / self.remove_duration)
+                    scale = 1.0 - remove_progress
+                    if scale <= 0:
+                        continue
+                    half = self.cell_size // 2
+                    size = int((self.cell_size - padding * 2) * scale)
+                    cx = x + half
+                    cy = y + half
+                    rect = pygame.Rect(cx - size // 2, cy - size // 2, size, size)
+                else:
+                    rect = pygame.Rect(
+                        x + dx + padding,
+                        y + dy + padding,
+                        self.cell_size - padding * 2,
+                        self.cell_size - padding * 2
+                    )
                 pygame.draw.rect(screen, color, rect, border_radius=8)
                 if self.selected == (i, j):
-                    pygame.draw.rect(screen, (self.colors["white"]), rect, 3, border_radius=8)
-        panel_x = self.offset_x + self.board.column * self.cell_size + 30
+                    pygame.draw.rect(screen, self.colors["white"], rect, 3, border_radius=8)
+        panel_x = self.offset_x + self.board.column * self.cell_size + 15
         panel_y = self.offset_y
-        font_label = pygame.font.Font(None, 46)
-        font_value = pygame.font.Font(None, 56)
-        label = font_label.render("Score", True, (self.colors["white"]))
+        font_label = pygame.font.Font(None, 36)
+        font_value = pygame.font.Font(None, 46)
+        label = font_label.render("Score", True, self.colors["white"])
         screen.blit(label, (panel_x, panel_y))
-        value = font_value.render(str(self.score), True, (self.colors["white"]))
+        value = font_value.render(str(self.score), True, self.colors["white"])
         screen.blit(value, (panel_x, panel_y + 35))
+
         if self.mode == "time":
-            time_label = font_label.render("Time", True, (self.colors["white"]))
+            time_label = font_label.render("Time", True, self.colors["white"])
             screen.blit(time_label, (panel_x, panel_y + 110))
             seconds = max(0, int(self.time_left))
             time_str = f"{seconds // 60}:{seconds % 60:02d}"
-            time_value = font_value.render(time_str, True, (self.colors["white"]))
+            time_value = font_value.render(time_str, True, self.colors["white"])
             screen.blit(time_value, (panel_x, panel_y + 145))
+
         if self.mode == "score":
-            moves_label = font_label.render("Moves", True, (self.colors["white"]))
+            moves_label = font_label.render("Moves", True, self.colors["white"])
             screen.blit(moves_label, (panel_x, panel_y + 110))
-            moves_value = font_value.render(str(self.moves_left), True, (self.colors["white"]))
+            moves_value = font_value.render(str(self.moves_left), True, self.colors["white"])
             screen.blit(moves_value, (panel_x, panel_y + 145))
-            goal_label = font_label.render("Цель", True, (self.colors["white"]))
+            goal_label = font_label.render("Goal", True, self.colors["white"])
             screen.blit(goal_label, (panel_x, panel_y + 220))
-            goal_value = font_value.render(str(self.goal), True, (self.colors["yellow"]))
+            goal_value = font_value.render(str(self.goal), True, self.colors["yellow"])
             screen.blit(goal_value, (panel_x, panel_y + 255))
+
+    def _calc_drop_offsets(self):
+        offsets = {}
+        for j in range(self.board.column):
+            empty = 0
+            for i in range(self.board.row - 1, -1, -1):
+                if self.board.field[i][j] is None:
+                    empty += 1
+                elif empty > 0:
+                    offsets[(i, j)] = empty
+        return offsets
 
     def update(self):
         if self.mode == "time":
@@ -97,12 +136,38 @@ class Game:
         now = pygame.time.get_ticks()
         progress = min(1.0, (now - self.anim_start) / self.anim_duration)
         if self.anim_state == "swapping" and progress >= 1.0:
-            removed = self.board.swap(*self.swap_from, *self.swap_to)
-            if removed:
-                self.score += removed * self.points_per_jewel
+            r1, c1 = self.swap_from
+            r2, c2 = self.swap_to
+            self.board.field[r1][c1], self.board.field[r2][c2] = \
+                self.board.field[r2][c2], self.board.field[r1][c1]
+            matches = self.board.find_matches()
+            if matches:
+                self.removing = matches
+                self.remove_start = pygame.time.get_ticks()
+                self.anim_state = "removing"
                 if self.mode == "score":
                     self.moves_left -= 1
-            self.anim_state = "idle"
+                self.score += len(matches) * self.points_per_jewel
+            else:
+                self.board.field[r1][c1], self.board.field[r2][c2] = \
+                    self.board.field[r2][c2], self.board.field[r1][c1]
+                self.anim_state = "idle"
+        if self.anim_state == "removing":
+            remove_progress = min(1.0, (now - self.remove_start) / self.remove_duration)
+            if remove_progress >= 1.0:
+                for i, j in self.removing:
+                    self.board.field[i][j] = None
+                self.removing = set()
+                self.drop_offsets = self._calc_drop_offsets()
+                self.board.drop_jewels()
+                self.board.fill_empty()
+                self.drop_start = pygame.time.get_ticks()
+                self.anim_state = "dropping"
+        if self.anim_state == "dropping":
+            drop_progress = min(1.0, (now - self.drop_start) / self.drop_duration)
+            if drop_progress >= 1.0:
+                self.drop_offsets = {}
+                self.anim_state = "idle"
 
     def get_cell(self, mouse_x, mouse_y):
         col = (mouse_x - self.offset_x) // self.cell_size
