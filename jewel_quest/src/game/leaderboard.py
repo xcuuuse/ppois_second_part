@@ -23,6 +23,8 @@ class LeaderBoard:
         self._save()
 
     def is_high_score(self, score):
+        if score <= 0:
+            return False
         if len(self.records) < 10:
             return True
         return score > self.records[-1]["score"]
@@ -48,15 +50,15 @@ class LeaderBoardScreen:
 
     def draw(self, screen):
         screen.fill((30, 20, 50))
-        title = self.font_title.render("Таблица рекордов", True, (255, 255, 255))
+        title = self.font_title.render("Leaderboard", True, (255, 255, 255))
         screen.blit(title, title.get_rect(center=(self.width // 2, 60)))
         if self.leaderboard is None or len(self.leaderboard.records) == 0:
-            empty = self.font_text.render("Рекордов пока нет", True, (150, 150, 150))
+            empty = self.font_text.render("No records yet", True, (150, 150, 150))
             screen.blit(empty, empty.get_rect(center=(self.width // 2, self.height // 2)))
         else:
             for i, record in enumerate(self.leaderboard.records):
                 line = f"{i + 1}.  {record['name']}  —  {record['score']}"
                 text = self.font_text.render(line, True, (255, 255, 255))
                 screen.blit(text, text.get_rect(center=(self.width // 2, 150 + i * 55)))
-        hint = self.font_hint.render("Нажмите ESC для выхода в меню", True, (150, 150, 150))
+        hint = self.font_hint.render("Press ESC to return to menu", True, (150, 150, 150))
         screen.blit(hint, hint.get_rect(center=(self.width // 2, self.height - 40)))

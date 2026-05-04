@@ -1,5 +1,5 @@
 import pygame
-from src.game.config import Config
+from src.game.config import ConfigGame
 from src.game.menu import Menu, ConfirmDialog, Reference, ModeSelect, DifficultySelect
 from src.game.leaderboard import LeaderBoardScreen, LeaderBoard
 from src.game.game import Game, GameOver
@@ -7,14 +7,14 @@ from src.game.game import Game, GameOver
 
 def main():
     pygame.init()
-    config = Config()
+    config = ConfigGame()
     game = None
     audio_config = config.get("audio")
     pygame.mixer.init()
     pygame.mixer.music.load(audio_config["menu_music"])
     pygame.mixer.music.set_volume(audio_config["music_volume"])
     pygame.mixer.music.play(-1)
-    dialog = ConfirmDialog(config, "Хотите выйти из игры?")
+    dialog = ConfirmDialog(config, "Quit?")
     screen_config = config.get("screen")
     screen = pygame.display.set_mode((screen_config["width"], screen_config["height"]))
     pygame.display.set_caption(config.get("title"))
@@ -59,7 +59,7 @@ def main():
                     show_difficulty = False
                     show_mode_select = True
                 elif result is not None:
-                    game = Game(config, "score", result)  # передаём выбранный уровень
+                    game = Game(config, "score", result)
                     state = "game"
                     show_difficulty = False
             elif show_mode_select:

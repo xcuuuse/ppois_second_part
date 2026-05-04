@@ -1,14 +1,16 @@
 import pygame
-
 from src.game.board import Board
 from src.game.leaderboard import LeaderBoard
-
+from src.game.config import ConfigGame, ConfigColor
 
 class Game:
-    def __init__(self, config, mode, level=None):
+    def __init__(self, config: ConfigGame, mode, level=None):
         board_config = config.get("board")
         game_config = config.get("game")
         screen_config = config.get("screen")
+        config_color = ConfigColor()
+        colors_raw = config_color.get("colors")
+        self.colors = {key: tuple(value) for key, value in colors_raw.items()}
         self.mode = mode
         self.score = 0
         self.selected = None
@@ -43,30 +45,30 @@ class Game:
                 rect = pygame.Rect(x + padding, y + padding, self.cell_size - padding * 2, self.cell_size - padding * 2)
                 pygame.draw.rect(screen, color, rect, border_radius=8)
                 if self.selected == (i, j):
-                    pygame.draw.rect(screen, (255, 255, 255), rect, 3, border_radius=8)
+                    pygame.draw.rect(screen, (self.colors["white"]), rect, 3, border_radius=8)
         panel_x = self.offset_x + self.board.column * self.cell_size + 30
         panel_y = self.offset_y
         font_label = pygame.font.Font(None, 46)
         font_value = pygame.font.Font(None, 56)
-        label = font_label.render("Очки", True, (255, 255, 255))
+        label = font_label.render("Score", True, (self.colors["white"]))
         screen.blit(label, (panel_x, panel_y))
-        value = font_value.render(str(self.score), True, (255, 255, 255))
+        value = font_value.render(str(self.score), True, (self.colors["white"]))
         screen.blit(value, (panel_x, panel_y + 35))
         if self.mode == "time":
-            time_label = font_label.render("Время", True, (255, 255, 255))
+            time_label = font_label.render("Time", True, (self.colors["white"]))
             screen.blit(time_label, (panel_x, panel_y + 110))
             seconds = max(0, int(self.time_left))
             time_str = f"{seconds // 60}:{seconds % 60:02d}"
-            time_value = font_value.render(time_str, True, (255, 255, 255))
+            time_value = font_value.render(time_str, True, (self.colors["white"]))
             screen.blit(time_value, (panel_x, panel_y + 145))
         if self.mode == "score":
-            moves_label = font_label.render("Ходов", True, (255, 255, 255))
+            moves_label = font_label.render("Moves", True, (self.colors["white"]))
             screen.blit(moves_label, (panel_x, panel_y + 110))
-            moves_value = font_value.render(str(self.moves_left), True, (255, 255, 255))
+            moves_value = font_value.render(str(self.moves_left), True, (self.colors["white"]))
             screen.blit(moves_value, (panel_x, panel_y + 145))
-            goal_label = font_label.render("Цель", True, (255, 255, 255))
+            goal_label = font_label.render("Цель", True, (self.colors["white"]))
             screen.blit(goal_label, (panel_x, panel_y + 220))
-            goal_value = font_value.render(str(self.goal), True, (255, 220, 80))
+            goal_value = font_value.render(str(self.goal), True, (self.colors["yellow"]))
             screen.blit(goal_value, (panel_x, panel_y + 255))
 
     def update(self):
@@ -105,6 +107,8 @@ class Game:
             return self.moves_left <= 0
 
 
+
+
 class GameOver:
     def __init__(self, config, score, mode, leaderboard):
         self.score = score
@@ -113,6 +117,9 @@ class GameOver:
         self.is_record = leaderboard.is_high_score(score)
         self.name_input = ""
         self.input_activate = True
+        config_color = ConfigColor()
+        colors_raw = config_color.get("colors")
+        self.colors = {key: tuple(value) for key, value in colors_raw.items()}
         screen_config = config.get("screen")
         self.width = screen_config["width"]
         self.height = screen_config["height"]
@@ -122,6 +129,7 @@ class GameOver:
         button_width, button_height = 220, 55
         self.menu_rect = pygame.Rect(self.width // 2 - button_width - 20, self.height - 120, button_width, button_height)
         self.retry_rect = pygame.Rect(self.width // 2 + 20, self.height - 120, button_width, button_height)
+
 
     def handle_event(self, event, leaderboard: LeaderBoard):
         if self.is_record and self.input_activate:
@@ -140,30 +148,30 @@ class GameOver:
 
     def draw(self, screen):
         screen.fill((20, 15, 40))
-        title = self.font_title.render("Игра окончена", True, (255, 255, 255))
+        title = self.font_title.render("Game Over", True, (self.colors["white"]))
         screen.blit(title, title.get_rect(center=(self.width // 2, 100)))
-        score_text = self.font_text.render(f"Ваш счет: {self.score}", True, (255, 255, 255))
+        score_text = self.font_text.render(f"Score: {self.score}", True, (self.colors["white"]))
         screen.blit(score_text, score_text.get_rect(center=(self.width // 2, 200)))
         if self.is_record:
-            record_text = self.font_text.render("Новый рекорд", True, (255, 255, 255))
+            record_text = self.font_text.render("New record!", True, (self.colors["white"]))
             screen.blit(record_text, record_text.get_rect(center=(self.width // 2, 280)))
             if self.input_activate:
-                prompt = self.font_text.render("Введите имя: ", True, (200, 200, 200))
+                prompt = self.font_text.render("Your name: ", True, (200, 200, 200))
                 screen.blit(prompt, prompt.get_rect(center=(self.width // 2, 350)))
                 input_rect = pygame.Rect(self.width // 2 - 150, 390, 300, 50)
                 pygame.draw.rect(screen, (50, 40, 90), input_rect, border_radius=8)
                 pygame.draw.rect(screen, (150, 120, 200), input_rect, 2, border_radius=8)
-                name_text = self.font_text.render(self.name_input, True, (255, 255, 255))
+                name_text = self.font_text.render(self.name_input, True, (self.colors["white"]))
                 screen.blit(name_text, name_text.get_rect(center=input_rect.center))
-                hint = self.font_button.render("Нажмите Enter для сохранения", True, (150, 150, 150))
+                hint = self.font_button.render("Press Enter to save", True, (150, 150, 150))
                 screen.blit(hint, hint.get_rect(center=(self.width // 2, 460)))
             else:
-                saved = self.font_text.render("Рекорд сохранен", True, (100, 255, 100))
+                saved = self.font_text.render("The record has been saved", True, (100, 255, 100))
                 screen.blit(saved, saved.get_rect(center=(self.width // 2, 370)))
         mouse_pos = pygame.mouse.get_pos()
-        for rect, label in [(self.menu_rect, "В меню"), (self.retry_rect, "Играть снова")]:
+        for rect, label in [(self.menu_rect, "Back"), (self.retry_rect, "Play again")]:
             color = (80, 60, 120) if rect.collidepoint(mouse_pos) else (50, 40, 90)
             pygame.draw.rect(screen, color, rect, border_radius=8)
             pygame.draw.rect(screen, (150, 120, 200), rect, 2, border_radius=8)
-            text = self.font_button.render(label, True, (255, 255, 255))
+            text = self.font_button.render(label, True, (self.colors["white"]))
             screen.blit(text, text.get_rect(center=rect.center))
