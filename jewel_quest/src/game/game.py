@@ -3,6 +3,7 @@ from src.game.board import Board
 from src.game.leaderboard import LeaderBoard
 from src.game.config import ConfigGame, ConfigColor
 
+
 class Game:
     def __init__(self, config: ConfigGame, mode, level=None):
         board_config = config.get("board")
@@ -30,9 +31,16 @@ class Game:
         self.points_per_jewel = game_config["points_per_jewel"]
         self.offset_x = (screen_config["width"] - board_pixel_w) // 2
         self.offset_y = (screen_config["height"] - board_pixel_h) // 2
+        self.anim_state = "idle"
+        self.anim_start = 0
+        self.swap_from = None
+        self.swap_to = None
+        self.anim_duration = 200
 
     def draw(self, screen):
         screen.fill((20, 15, 40))
+        now = pygame.time.get_ticks()
+        progress = min(1.0, (now - self.anim_start) / self.anim_duration) if self.anim_state == "swapping" else 1.0
         for i in range(self.board.row):
             for j in range(self.board.column):
                 x = self.offset_x + j * self.cell_size
@@ -40,9 +48,19 @@ class Game:
                 jewel = self.board.field[i][j]
                 if not jewel:
                     continue
+                dx, dy = 0, 0
+                if self.anim_state == "swapping":
+                    r1, c1 = self.swap_from
+                    r2, c2 = self.swap_to
+                    if (i, j) == (r1, c1):
+                        dx = (c2 - c1) * self.cell_size * progress
+                        dy = (r2 - r1) * self.cell_size * progress
+                    elif (i, j) == (r2, c2):
+                        dx = (c1 - c2) * self.cell_size * progress
+                        dy = (r1 - r2) * self.cell_size * progress
                 color = jewel.value
                 padding = 6
-                rect = pygame.Rect(x + padding, y + padding, self.cell_size - padding * 2, self.cell_size - padding * 2)
+                rect = pygame.Rect(x+dx+padding, y+dy+padding, self.cell_size - padding * 2, self.cell_size - padding * 2)
                 pygame.draw.rect(screen, color, rect, border_radius=8)
                 if self.selected == (i, j):
                     pygame.draw.rect(screen, (self.colors["white"]), rect, 3, border_radius=8)
@@ -76,6 +94,15 @@ class Game:
             now = pygame.time.get_ticks()
             self.time_left -= (now - self.last_tick) / 1000
             self.last_tick = now
+        now = pygame.time.get_ticks()
+        progress = min(1.0, (now - self.anim_start) / self.anim_duration)
+        if self.anim_state == "swapping" and progress >= 1.0:
+            removed = self.board.swap(*self.swap_from, *self.swap_to)
+            if removed:
+                self.score += removed * self.points_per_jewel
+                if self.mode == "score":
+                    self.moves_left -= 1
+            self.anim_state = "idle"
 
     def get_cell(self, mouse_x, mouse_y):
         col = (mouse_x - self.offset_x) // self.cell_size
@@ -84,8 +111,16 @@ class Game:
             return (row, col)
         return None
 
+    def start_swap(self, cell1, cell2):
+        self.anim_state = "swapping"
+        self.anim_start = pygame.time.get_ticks()
+        self.swap_from = cell1
+        self.swap_to = cell2
+
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.anim_state != "idle":
+                return
             cell = self.get_cell(*event.pos)
             if cell is None:
                 self.selected = None
@@ -93,11 +128,7 @@ class Game:
             if self.selected is None:
                 self.selected = cell
             else:
-                removed = self.board.swap(*self.selected, *cell)
-                if removed:
-                    self.score += removed * self.points_per_jewel
-                    if self.mode == "score":
-                        self.moves_left -= 1
+                self.start_swap(self.selected, cell)
                 self.selected = None
 
     def is_over(self):
