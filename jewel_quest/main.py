@@ -94,7 +94,7 @@ def main():
             elif state == "game":
                 game.handle_event(event)
             elif state == "game_over":
-                result = game_over.handle_event(event, leaderboard)
+                result = game_over.handle_event_with_leaderboard(event, leaderboard)
                 if result == "menu":
                     state = "menu"
                     game_over = None

@@ -1,7 +1,7 @@
 import pygame
 from src.game.board import Board
 from src.game.leaderboard import LeaderBoard
-from src.common.config import ConfigGame, ConfigColor
+from src.common.config import ConfigGame
 from src.common.jewel import JEWEL
 from src.common.screen import Screen
 
@@ -258,33 +258,22 @@ class Game(Screen):
         if self.mode == "score":
             return self.moves_left <= 0
 
-
-
-
-class GameOver:
-    def __init__(self, config, score, mode, leaderboard):
+class GameOver(Screen):
+    def __init__(self, config: ConfigGame, score, mode, leaderboard: LeaderBoard):
+        super().__init__(config)
         self.score = score
         self.mode = mode
         self.leaderboard = leaderboard
         self.is_record = leaderboard.is_high_score(score)
         self.name_input = ""
         self.input_activate = True
-        config_color = ConfigColor()
-        colors_raw = config_color.get("colors")
-        self.colors = {key: tuple(value) for key, value in colors_raw.items()}
-        screen_config = config.get("screen")
-        self.width = screen_config["width"]
-        self.height = screen_config["height"]
-        self.font_title = pygame.font.Font(None, 72)
-        self.font_text = pygame.font.Font(None, 48)
-        self.font_button = pygame.font.Font(None, 42)
         self.cursor_visible = True
         self.cursor_timer = pygame.time.get_ticks()
         button_width, button_height = 220, 55
         self.menu_rect = pygame.Rect(self.width // 2 - button_width - 20, self.height - 120, button_width, button_height)
         self.retry_rect = pygame.Rect(self.width // 2 + 20, self.height - 120, button_width, button_height)
 
-    def handle_event(self, event, leaderboard: LeaderBoard):
+    def handle_event_with_leaderboard(self, event, leaderboard: LeaderBoard):
         if self.is_record and self.input_activate:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
@@ -295,12 +284,13 @@ class GameOver:
                 else:
                     self.name_input += event.unicode
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.menu_rect.collidepoint(event.pos): return "menu"
-            if self.retry_rect.collidepoint(event.pos): return "retry"
+            if self.menu_rect.collidepoint(event.pos):
+                return "menu"
+            if self.retry_rect.collidepoint(event.pos):
+                return "retry"
             return None
 
     def draw(self, screen):
-
         screen.fill((20, 15, 40))
         title = self.font_title.render("Game Over", True, (self.colors["white"]))
         screen.blit(title, title.get_rect(center=(self.width // 2, 100)))
@@ -310,22 +300,22 @@ class GameOver:
             record_text = self.font_text.render("New record!", True, (self.colors["white"]))
             screen.blit(record_text, record_text.get_rect(center=(self.width // 2, 280)))
             if self.input_activate:
-                prompt = self.font_text.render("Your name: ", True, (200, 200, 200))
+                prompt = self.font_text.render("Your name: ", True, self.colors["light_gray"])
                 screen.blit(prompt, prompt.get_rect(center=(self.width // 2, 350)))
                 input_rect = pygame.Rect(self.width // 2 - 150, 390, 300, 50)
-                pygame.draw.rect(screen, (50, 40, 90), input_rect, border_radius=8)
-                pygame.draw.rect(screen, (150, 120, 200), input_rect, 2, border_radius=8)
+                pygame.draw.rect(screen, self.colors["dark_purple"], input_rect, border_radius=8)
+                pygame.draw.rect(screen, self.colors["light_purple"], input_rect, 2, border_radius=8)
                 name_text = self.font_text.render(self.name_input, True, (self.colors["white"]))
                 screen.blit(name_text, name_text.get_rect(center=input_rect.center))
-                hint = self.font_button.render("Press Enter to save", True, (150, 150, 150))
+                hint = self.font_button.render("Press Enter to save", True, self.colors["gray"])
                 screen.blit(hint, hint.get_rect(center=(self.width // 2, 460)))
             else:
-                saved = self.font_text.render("The record has been saved", True, (100, 255, 100))
+                saved = self.font_text.render("The record has been saved", True, self.colors["green"])
                 screen.blit(saved, saved.get_rect(center=(self.width // 2, 370)))
         mouse_pos = pygame.mouse.get_pos()
         for rect, label in [(self.menu_rect, "Back"), (self.retry_rect, "Play again")]:
-            color = (80, 60, 120) if rect.collidepoint(mouse_pos) else (50, 40, 90)
+            color = (80, 60, 120) if rect.collidepoint(mouse_pos) else self.colors["dark_purple"]
             pygame.draw.rect(screen, color, rect, border_radius=8)
-            pygame.draw.rect(screen, (150, 120, 200), rect, 2, border_radius=8)
+            pygame.draw.rect(screen, self.colors["light_purple"], rect, 2, border_radius=8)
             text = self.font_button.render(label, True, (self.colors["white"]))
             screen.blit(text, text.get_rect(center=rect.center))

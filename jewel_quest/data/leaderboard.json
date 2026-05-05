@@ -1,6 +1,9 @@
 {
   "records": [
-
+    {
+      "name": "alex",
+      "score": 120,
+      "mode": "time"
+    }
   ]
 }
-
