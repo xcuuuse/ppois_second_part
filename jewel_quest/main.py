@@ -7,6 +7,7 @@ from src.game.game import Game, GameOver
 
 def main():
     pygame.init()
+    pygame.key.set_repeat(400, 50)
     config = ConfigGame()
     game = None
     audio_config = config.get("audio")
@@ -23,7 +24,6 @@ def main():
     ref = Reference(config)
     difficulty_select = DifficultySelect(config)
     show_difficulty = False
-    selected_level = None
     leaderboard = LeaderBoard()
     state = "menu"
     show_dialog = False
@@ -70,9 +70,13 @@ def main():
                     game = Game(config, "time")
                     state = "game"
                     show_mode_select = False
+                    pygame.mixer.music.load(audio_config["level_music"])
+                    pygame.mixer.music.play(-1)
                 elif result == "score":
                     show_mode_select = False
                     show_difficulty = True
+                    pygame.mixer.music.load(audio_config["level_music"])
+                    pygame.mixer.music.play(-1)
             elif show_dialog:
                 result = dialog.handle_event(event)
                 if result == True:
@@ -94,10 +98,14 @@ def main():
                 if result == "menu":
                     state = "menu"
                     game_over = None
+                    pygame.mixer.music.load(audio_config["menu_music"])
+                    pygame.mixer.music.play(-1)
                 elif result == "retry":
                     game = Game(config, game.mode)
                     state = "game"
                     game_over = None
+                    pygame.mixer.music.load(audio_config["menu_music"])
+                    pygame.mixer.music.play(-1)
         if show_difficulty:
             difficulty_select.draw(screen)
         elif show_mode_select:

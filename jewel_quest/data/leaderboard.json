@@ -1,14 +1,6 @@
 {
   "records": [
-    {
-      "name": "Player1",
-      "score": 720,
-      "mode": "score"
-    },
-    {
-      "name": "Player_time1",
-      "score": 150,
-      "mode": "time"
-    }
+
   ]
 }
+

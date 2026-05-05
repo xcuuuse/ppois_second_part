@@ -27,6 +27,7 @@
     "music_volume": 0.5,
     "click_volume": 0.1,
     "menu_music": "assets/audio/zero.wav",
-    "sound": "assets/audio/untitled.wav"
+    "sound": "assets/audio/untitled.wav",
+    "level_music": "assets/audio/level_music.wav"
   }
 }

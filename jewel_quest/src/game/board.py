@@ -7,6 +7,8 @@ class Board:
         self.field = [[None] * column for _ in range(row)]
         self.row = row
         self.column = column
+        self.special = {JEWEL.BOMB, JEWEL.LINE, JEWEL.COLOR}
+        self.regular = [jewel for jewel in JEWEL if jewel not in self.special]
 
     def fill(self):
         for i in range(self.row):
@@ -16,7 +18,7 @@ class Board:
                     forbidden.add(self.field[i][j - 1])
                 if i >= 2 and self.field[i - 1][j] == self.field[i - 2][j]:
                     forbidden.add(self.field[i - 1][j])
-                choices = [t for t in JEWEL if t not in forbidden]
+                choices = [t for t in self.regular if t not in forbidden]
                 self.field[i][j] = random.choice(choices)
 
     def swap(self, row: int, column: int, new_row: int, new_column: int):
@@ -72,7 +74,10 @@ class Board:
         for i in range(self.row):
             for j in range(self.column):
                 if self.field[i][j] is None:
-                    self.field[i][j] = random.choice(list(JEWEL))
+                    if random.random() < 0.05:
+                        self.field[i][j] = random.choice(list(self.special))
+                    else:
+                        self.field[i][j] = random.choice(list(self.regular))
 
     def process(self):
         while True:
@@ -83,3 +88,25 @@ class Board:
             self.drop_jewels()
             self.fill_empty()
 
+    def apply_bomb(self, row: int, column: int):
+        to_remove = set()
+        for di in range(-1, 2):
+            for dj in range(-1, 2):
+                ni, nj = row + di, column + dj
+                if 0 <= ni < self.row and 0 <= nj < self.column:
+                    to_remove.add((ni, nj))
+        return to_remove
+
+    def apply_line(self, row, column):
+        to_remove = set()
+        for j in range(self.column):
+            to_remove.add((row, j))
+        return to_remove
+
+    def apply_color(self, row, column, target_color):
+        to_remove = set()
+        for i in range(self.row):
+            for j in range(self.column):
+                if self.field[i][j] == target_color:
+                    to_remove.add((i, j))
+        return to_remove

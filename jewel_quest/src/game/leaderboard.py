@@ -25,7 +25,7 @@ class LeaderBoard:
     def is_high_score(self, score):
         if score <= 0:
             return False
-        if len(self.records) < 10:
+        if len(self.records) == 0:
             return True
         return score > self.records[-1]["score"]
 

@@ -2,7 +2,7 @@ import pygame
 from src.game.board import Board
 from src.game.leaderboard import LeaderBoard
 from src.game.config import ConfigGame, ConfigColor
-
+from src.common.jewel import JEWEL
 
 class Game:
     def __init__(self, config: ConfigGame, mode, level=None):
@@ -37,6 +37,7 @@ class Game:
         self.swap_to = None
         self.anim_duration = 200
         self.removing = set()
+        self.pending_special = None
         self.remove_start = 0
         self.remove_duration = 300
         self.drop_offsets = {}
@@ -88,6 +89,26 @@ class Game:
                         self.cell_size - padding * 2
                     )
                 pygame.draw.rect(screen, color, rect, border_radius=8)
+                cx = rect.centerx
+                cy = rect.centery
+                icon_font = pygame.font.Font(None, 28)
+
+                if jewel == JEWEL.BOMB:
+                    size = 12
+                    bomb_rect = pygame.Rect(cx - size // 2, cy - size // 2, size, size)
+                    pygame.draw.rect(screen, (0, 0, 0), bomb_rect, border_radius=3)
+                elif jewel == JEWEL.LINE:
+                    pygame.draw.line(screen, (0, 0, 0), (rect.left + 4, cy),
+                                     (rect.right - 4, cy), 3)
+                    pygame.draw.line(screen, (0, 0, 0), (rect.left + 4, cy - 5),
+                                     (rect.right - 4, cy - 5), 2)
+                elif jewel == JEWEL.COLOR:
+                    pygame.draw.line(screen, (0, 0, 0), (cx - 8, cy), (cx + 8, cy), 3)
+                    pygame.draw.line(screen, (0, 0, 0), (cx, cy - 8), (cx, cy + 8), 3)
+                    pygame.draw.line(screen, (0, 0, 0), (cx - 6, cy - 6),
+                                     (cx + 6, cy + 6), 2)
+                    pygame.draw.line(screen, (0, 0, 0), (cx + 6, cy - 6),
+                                     (cx - 6, cy + 6), 2)
                 if self.selected == (i, j):
                     pygame.draw.rect(screen, self.colors["white"], rect, 3, border_radius=8)
         panel_x = self.offset_x + self.board.column * self.cell_size + 15
@@ -138,10 +159,33 @@ class Game:
         if self.anim_state == "swapping" and progress >= 1.0:
             r1, c1 = self.swap_from
             r2, c2 = self.swap_to
+            jewel1 = self.board.field[r1][c1]
+            jewel2 = self.board.field[r2][c2]
             self.board.field[r1][c1], self.board.field[r2][c2] = \
                 self.board.field[r2][c2], self.board.field[r1][c1]
+            extra = set()
+            if jewel1 == JEWEL.BOMB:
+                extra |= self.board.apply_bomb(r2, c2)
+            if jewel2 == JEWEL.BOMB:
+                extra |= self.board.apply_bomb(r1, c1)
+            if jewel1 == JEWEL.LINE:
+                extra |= self.board.apply_line(r2, c2)
+            if jewel2 == JEWEL.LINE:
+                extra |= self.board.apply_line(r1, c1)
+            if jewel1 == JEWEL.COLOR:
+                extra |= self.board.apply_color(r2, c2, jewel2)
+            if jewel2 == JEWEL.COLOR:
+                extra |= self.board.apply_color(r1, c1, jewel1)
             matches = self.board.find_matches()
+            matches |= extra
             if matches:
+                special = None
+                center = list(matches)[len(matches) // 2]
+                if (len(matches)) >= 5:
+                    special = (center, JEWEL.COLOR)
+                elif len(matches) == 4:
+                    special = (center, JEWEL.BOMB)
+                self.pending_special = special
                 self.removing = matches
                 self.remove_start = pygame.time.get_ticks()
                 self.anim_state = "removing"
@@ -158,6 +202,10 @@ class Game:
                 for i, j in self.removing:
                     self.board.field[i][j] = None
                 self.removing = set()
+                if self.pending_special:
+                    (pi, pj), jewel_type = self.pending_special
+                    self.board.field[pi][pj] = jewel_type
+                    self.pending_special = None
                 self.drop_offsets = self._calc_drop_offsets()
                 self.board.drop_jewels()
                 self.board.fill_empty()
@@ -229,6 +277,8 @@ class GameOver:
         self.font_title = pygame.font.Font(None, 72)
         self.font_text = pygame.font.Font(None, 48)
         self.font_button = pygame.font.Font(None, 42)
+        self.cursor_visible = True
+        self.cursor_timer = pygame.time.get_ticks()
         button_width, button_height = 220, 55
         self.menu_rect = pygame.Rect(self.width // 2 - button_width - 20, self.height - 120, button_width, button_height)
         self.retry_rect = pygame.Rect(self.width // 2 + 20, self.height - 120, button_width, button_height)
@@ -250,6 +300,7 @@ class GameOver:
             return None
 
     def draw(self, screen):
+
         screen.fill((20, 15, 40))
         title = self.font_title.render("Game Over", True, (self.colors["white"]))
         screen.blit(title, title.get_rect(center=(self.width // 2, 100)))
