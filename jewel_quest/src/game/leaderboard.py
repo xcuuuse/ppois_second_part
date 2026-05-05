@@ -1,7 +1,9 @@
 import os
 import json
-from src.game.config import Config
 import pygame
+from src.common.config import ConfigGame
+from src.common.screen import Screen
+
 
 
 class LeaderBoard:
@@ -30,17 +32,13 @@ class LeaderBoard:
         return score > self.records[-1]["score"]
 
 
-class LeaderBoardScreen:
-    def __init__(self, config: Config, leaderboard: LeaderBoard):
+class LeaderBoardScreen(Screen):
+    def __init__(self, config: ConfigGame, leaderboard: LeaderBoard):
+        super().__init__(config)
         self.leaderboard = leaderboard
-        screen_config = config.get("screen")
-        self.width = screen_config["width"]
-        self.height = screen_config["height"]
         dw, dh = 400, 200
         self.leaderboard_rect = pygame.Rect(self.width, self.height, dw, dh)
-        self.font_title = pygame.font.Font(None, 72)
         self.font_text = pygame.font.Font(None, 60)
-        self.font_hint = pygame.font.Font(None, 40)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -49,16 +47,16 @@ class LeaderBoardScreen:
         return None
 
     def draw(self, screen):
-        screen.fill((30, 20, 50))
-        title = self.font_title.render("Leaderboard", True, (255, 255, 255))
+        screen.fill(self.colors["black"])
+        title = self.font_title.render("Leaderboard", True, self.colors["white"])
         screen.blit(title, title.get_rect(center=(self.width // 2, 60)))
         if self.leaderboard is None or len(self.leaderboard.records) == 0:
-            empty = self.font_text.render("No records yet", True, (150, 150, 150))
+            empty = self.font_text.render("No records yet", True, self.colors["gray"])
             screen.blit(empty, empty.get_rect(center=(self.width // 2, self.height // 2)))
         else:
             for i, record in enumerate(self.leaderboard.records):
                 line = f"{i + 1}.  {record['name']}  —  {record['score']}"
-                text = self.font_text.render(line, True, (255, 255, 255))
+                text = self.font_text.render(line, True, self.colors["white"])
                 screen.blit(text, text.get_rect(center=(self.width // 2, 150 + i * 55)))
-        hint = self.font_hint.render("Press ESC to return to menu", True, (150, 150, 150))
+        hint = self.font_hint.render("Press ESC to return to menu", True, self.colors["gray"])
         screen.blit(hint, hint.get_rect(center=(self.width // 2, self.height - 40)))

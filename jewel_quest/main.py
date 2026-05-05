@@ -1,5 +1,5 @@
 import pygame
-from src.game.config import ConfigGame
+from src.common.config import ConfigGame
 from src.game.menu import Menu, ConfirmDialog, Reference, ModeSelect, DifficultySelect
 from src.game.leaderboard import LeaderBoardScreen, LeaderBoard
 from src.game.game import Game, GameOver

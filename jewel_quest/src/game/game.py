@@ -1,17 +1,18 @@
 import pygame
 from src.game.board import Board
 from src.game.leaderboard import LeaderBoard
-from src.game.config import ConfigGame, ConfigColor
+from src.common.config import ConfigGame, ConfigColor
 from src.common.jewel import JEWEL
+from src.common.screen import Screen
 
-class Game:
+
+class Game(Screen):
     def __init__(self, config: ConfigGame, mode, level=None):
+        screen_config = config.get("screen")
+        anim_config = config.get("animation")
+        super().__init__(config)
         board_config = config.get("board")
         game_config = config.get("game")
-        screen_config = config.get("screen")
-        config_color = ConfigColor()
-        colors_raw = config_color.get("colors")
-        self.colors = {key: tuple(value) for key, value in colors_raw.items()}
         self.mode = mode
         self.score = 0
         self.selected = None
@@ -35,14 +36,14 @@ class Game:
         self.anim_start = 0
         self.swap_from = None
         self.swap_to = None
-        self.anim_duration = 200
+        self.anim_duration = anim_config["anim_duration"]
         self.removing = set()
         self.pending_special = None
         self.remove_start = 0
-        self.remove_duration = 300
+        self.remove_duration = anim_config["remove_duration"]
         self.drop_offsets = {}
         self.drop_start = 0
-        self.drop_duration = 250
+        self.drop_duration = anim_config["drop_duration"]
 
     def draw(self, screen):
         screen.fill((20, 15, 40))
@@ -282,7 +283,6 @@ class GameOver:
         button_width, button_height = 220, 55
         self.menu_rect = pygame.Rect(self.width // 2 - button_width - 20, self.height - 120, button_width, button_height)
         self.retry_rect = pygame.Rect(self.width // 2 + 20, self.height - 120, button_width, button_height)
-
 
     def handle_event(self, event, leaderboard: LeaderBoard):
         if self.is_record and self.input_activate:

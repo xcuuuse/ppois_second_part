@@ -3,7 +3,9 @@
   "screen": {
     "width": 960,
     "height": 720,
-    "fps": 60
+    "fps": 60,
+    "button_width": 300,
+    "button_height": 55
   },
   "board": {
     "rows": 8,
@@ -29,5 +31,10 @@
     "menu_music": "assets/audio/zero.wav",
     "sound": "assets/audio/untitled.wav",
     "level_music": "assets/audio/level_music.wav"
+  },
+  "animation": {
+    "anim_duration": 200,
+    "remove_duration": 300,
+    "drop_duration": 250
   }
 }
