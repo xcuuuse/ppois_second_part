@@ -3,10 +3,10 @@ from src.common.config import ConfigGame
 from src.game.menu import Menu, ConfirmDialog, Reference, ModeSelect, DifficultySelect
 from src.game.leaderboard import LeaderBoardScreen, LeaderBoard
 from src.game.game import Game, GameOver
-
+from src.game.app import App
 
 def main():
-    pygame.init()
+   """ pygame.init()
     pygame.key.set_repeat(400, 50)
     config = ConfigGame()
     game = None
@@ -131,7 +131,9 @@ def main():
 
     pygame.quit()
 
-
+"""
+   app = App()
+   app.run()
 if __name__ == "__main__":
     main()
 

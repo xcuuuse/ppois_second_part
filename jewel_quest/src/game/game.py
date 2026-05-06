@@ -249,7 +249,10 @@ class Game(Screen):
             if self.selected is None:
                 self.selected = cell
             else:
-                self.start_swap(self.selected, cell)
+                r1, c1 = self.selected
+                r2, c2 = cell
+                if abs(r1 - r2) + abs(c1 - c2) == 1:
+                    self.start_swap(self.selected, cell)
                 self.selected = None
 
     def is_over(self):
