@@ -44,6 +44,11 @@ class Game(Screen):
         self.drop_offsets = {}
         self.drop_start = 0
         self.drop_duration = anim_config["drop_duration"]
+        audio_config = config.get("audio")
+        self.swap_sound = pygame.mixer.Sound(audio_config["sound"])
+        self.match_sound = pygame.mixer.Sound(audio_config["sound"])
+        self.swap_sound.set_volume(audio_config["click_volume"])
+        self.match_sound.set_volume(audio_config["click_volume"])
 
     def draw(self, screen):
         screen.fill((20, 15, 40))
@@ -180,6 +185,7 @@ class Game(Screen):
             matches = self.board.find_matches()
             matches |= extra
             if matches:
+                self.match_sound.play()
                 special = None
                 center = list(matches)[len(matches) // 2]
                 if (len(matches)) >= 5:
@@ -233,6 +239,7 @@ class Game(Screen):
         return None
 
     def start_swap(self, cell1, cell2):
+        self.swap_sound.play()
         self.anim_state = "swapping"
         self.anim_start = pygame.time.get_ticks()
         self.swap_from = cell1
