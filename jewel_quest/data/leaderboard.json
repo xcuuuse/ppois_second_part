@@ -1,9 +1,29 @@
 {
   "records": [
     {
-      "name": "alex",
-      "score": 120,
-      "mode": "time"
+      "name": "first",
+      "score": 1940,
+      "mode": "score"
+    },
+    {
+      "name": "a",
+      "score": 1690,
+      "mode": "score"
+    },
+    {
+      "name": "showmelove",
+      "score": 1660,
+      "mode": "score"
+    },
+    {
+      "name": "not_showmelove",
+      "score": 1600,
+      "mode": "score"
+    },
+    {
+      "name": "name",
+      "score": 1490,
+      "mode": "score"
     }
   ]
 }

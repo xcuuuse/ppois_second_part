@@ -6,12 +6,12 @@ from src.common.screen import Screen
 class ConfirmDialog(Screen):
     def __init__(self, config, message: str):
         super().__init__(config)
-        dw, dh = 400, 200
-        dx = self.width // 2 - dw // 2
-        dy = self.height // 2 - dh // 2
+        dialog_width, dialog_height = 400, 200
+        dx = self.width // 2 - dialog_width // 2
+        dy = self.height // 2 - dialog_height // 2
         self.button_width, self.button_height = 150, 50
         self.message = message
-        self.dialog_rect = pygame.Rect(dx, dy, dw, dh)
+        self.dialog_rect = pygame.Rect(dx, dy, dialog_width, dialog_height)
         self.yes_rect = pygame.Rect(dx + 60, dy + 120, self.button_width, self.button_height)
         self.no_rect = pygame.Rect(dx + 220, dy + 120, self.button_width, self.button_height)
         self.font = pygame.font.Font(None, 36)
@@ -53,8 +53,8 @@ class ConfirmDialog(Screen):
 class Reference(Screen):
     def __init__(self, config: ConfigGame):
         super().__init__(config)
-        dw, dh = 400, 200
-        self.reference_rect = pygame.Rect(self.width, self.height, dw, dh)
+        dialog_width, dialog_height = 400, 200
+        self.reference_rect = pygame.Rect(self.width, self.height, dialog_width, dialog_height)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -67,10 +67,10 @@ class Reference(Screen):
         pygame.draw.rect(screen, self.colors["light_purple"], self.reference_rect, width=2, border_radius=12)
         title = self.font_title.render("JEWEL QUEST", True, self.colors["white"])
         lines = [
-            "Меняйте местами соседние камни",
-            "чтобы собрать 3 и более в ряд.",
-            "Режим 1: успей набрать очки за время.",
-            "Режим 2: пройди уровни по целям.",
+            "Swap adjacent stones,"
+            "to match 3 or more.",
+            "Mode 1: Score points before the time runs out.",
+            "Mode 2: Complete levels by difficulty level.",
         ]
         hint = self.font_hint.render("Press ESC to return to menu", True, self.colors["gray"])
         screen.blit(hint, hint.get_rect(center=(self.width // 2, self.height - 40)))

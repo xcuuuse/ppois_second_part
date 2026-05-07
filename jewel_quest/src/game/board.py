@@ -21,19 +21,6 @@ class Board:
                 choices = [t for t in self.regular if t not in forbidden]
                 self.field[i][j] = random.choice(choices)
 
-    def swap(self, row: int, column: int, new_row: int, new_column: int):
-        if abs(row - new_row) + abs(column - new_column) != 1:
-            return False
-        self.field[row][column], self.field[new_row][new_column] = (
-            self.field[new_row][new_column], self.field[row][column])
-        removed = self.remove_matches()
-        if not removed:
-            self.field[row][column], self.field[new_row][new_column] = (
-                self.field[new_row][new_column], self.field[row][column])
-            return 0
-        self.process()
-        return removed
-
     def find_matches(self):
         to_remove = set()
         for i in range(self.row):
@@ -78,15 +65,6 @@ class Board:
                         self.field[i][j] = random.choice(list(self.special))
                     else:
                         self.field[i][j] = random.choice(list(self.regular))
-
-    def process(self):
-        while True:
-            matches = self.find_matches()
-            if not matches:
-                break
-            self.remove_matches()
-            self.drop_jewels()
-            self.fill_empty()
 
     def apply_bomb(self, row: int, column: int):
         to_remove = set()

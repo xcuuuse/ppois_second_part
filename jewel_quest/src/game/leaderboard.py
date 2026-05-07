@@ -5,9 +5,9 @@ from src.common.config import ConfigGame
 from src.common.screen import Screen
 
 
-
 class LeaderBoard:
-    def __init__(self, path='data/leaderboard.json'):
+    def __init__(self, path='data/leaderboard.json', max_records=5):
+        self.max_records = max_records
         self.path = path
         if os.path.exists(self.path):
             with open(self.path, 'r', encoding='utf-8') as f:
@@ -21,7 +21,7 @@ class LeaderBoard:
     def add(self, name, score, mode):
         self.records.append({"name": name, "score": score, "mode": mode})
         self.records.sort(key=lambda x: x["score"], reverse=True)
-        self.records = self.records[:10]
+        self.records = self.records[:self.max_records]
         self._save()
 
     def is_high_score(self, score):
@@ -29,7 +29,7 @@ class LeaderBoard:
             return False
         if len(self.records) == 0:
             return True
-        return score > self.records[-1]["score"]
+        return score > self.records[0]["score"]
 
 
 class LeaderBoardScreen(Screen):

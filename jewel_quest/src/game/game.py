@@ -97,8 +97,6 @@ class Game(Screen):
                 pygame.draw.rect(screen, color, rect, border_radius=8)
                 cx = rect.centerx
                 cy = rect.centery
-                icon_font = pygame.font.Font(None, 28)
-
                 if jewel == JEWEL.BOMB:
                     size = 12
                     bomb_rect = pygame.Rect(cx - size // 2, cy - size // 2, size, size)
@@ -125,7 +123,6 @@ class Game(Screen):
         screen.blit(label, (panel_x, panel_y))
         value = font_value.render(str(self.score), True, self.colors["white"])
         screen.blit(value, (panel_x, panel_y + 35))
-
         if self.mode == "time":
             time_label = font_label.render("Time", True, self.colors["white"])
             screen.blit(time_label, (panel_x, panel_y + 110))
@@ -133,7 +130,6 @@ class Game(Screen):
             time_str = f"{seconds // 60}:{seconds % 60:02d}"
             time_value = font_value.render(time_str, True, self.colors["white"])
             screen.blit(time_value, (panel_x, panel_y + 145))
-
         if self.mode == "score":
             moves_label = font_label.render("Moves", True, self.colors["white"])
             screen.blit(moves_label, (panel_x, panel_y + 110))
@@ -269,12 +265,14 @@ class Game(Screen):
             return self.moves_left <= 0
 
 class GameOver(Screen):
-    def __init__(self, config: ConfigGame, score, mode, leaderboard: LeaderBoard):
+    def __init__(self, config: ConfigGame, score, mode, leaderboard: LeaderBoard, goal=None):
         super().__init__(config)
         self.score = score
+        self.is_record = leaderboard.is_high_score(score)
+        if mode == "score" and score < goal:
+            self.is_record = False
         self.mode = mode
         self.leaderboard = leaderboard
-        self.is_record = leaderboard.is_high_score(score)
         self.name_input = ""
         self.input_activate = True
         self.cursor_visible = True

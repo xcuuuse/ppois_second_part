@@ -22,3 +22,4 @@ class Screen:
 
     def draw(self, screen):
         pass
+
