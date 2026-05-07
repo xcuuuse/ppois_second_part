@@ -8,11 +8,12 @@ from src.common.screen import Screen
 
 class Game(Screen):
     def __init__(self, config: ConfigGame, mode, level=None):
+        super().__init__(config)
         screen_config = config.get("screen")
         anim_config = config.get("animation")
-        super().__init__(config)
         board_config = config.get("board")
         game_config = config.get("game")
+        audio_config = config.get("audio")
         self.mode = mode
         self.score = 0
         self.selected = None
@@ -44,7 +45,8 @@ class Game(Screen):
         self.drop_offsets = {}
         self.drop_start = 0
         self.drop_duration = anim_config["drop_duration"]
-        audio_config = config.get("audio")
+        self.font_label = pygame.font.Font(None, 36)
+        self.font_value = pygame.font.Font(None, 46)
         self.swap_sound = pygame.mixer.Sound(audio_config["sound"])
         self.match_sound = pygame.mixer.Sound(audio_config["sound"])
         self.swap_sound.set_volume(audio_config["click_volume"])
@@ -52,93 +54,8 @@ class Game(Screen):
 
     def draw(self, screen):
         screen.fill((20, 15, 40))
-        now = pygame.time.get_ticks()
-        progress = min(1.0, (now - self.anim_start) / self.anim_duration) if self.anim_state == "swapping" else 1.0
-        for i in range(self.board.row):
-            for j in range(self.board.column):
-                x = self.offset_x + j * self.cell_size
-                y = self.offset_y + i * self.cell_size
-                jewel = self.board.field[i][j]
-                if not jewel:
-                    continue
-                dx, dy = 0, 0
-                if self.anim_state == "swapping":
-                    r1, c1 = self.swap_from
-                    r2, c2 = self.swap_to
-                    if (i, j) == (r1, c1):
-                        dx = (c2 - c1) * self.cell_size * progress
-                        dy = (r2 - r1) * self.cell_size * progress
-                    elif (i, j) == (r2, c2):
-                        dx = (c1 - c2) * self.cell_size * progress
-                        dy = (r1 - r2) * self.cell_size * progress
-                if self.anim_state == "dropping" and (i, j) in self.drop_offsets:
-                    drop_progress = min(1.0, (now - self.drop_start) / self.drop_duration)
-                    cells = self.drop_offsets[(i, j)]
-                    dy = -cells * self.cell_size * (1.0 - drop_progress)
-                color = jewel.value
-                padding = 6
-                if self.anim_state == "removing" and (i, j) in self.removing:
-                    remove_progress = min(1.0, (now - self.remove_start) / self.remove_duration)
-                    scale = 1.0 - remove_progress
-                    if scale <= 0:
-                        continue
-                    half = self.cell_size // 2
-                    size = int((self.cell_size - padding * 2) * scale)
-                    cx = x + half
-                    cy = y + half
-                    rect = pygame.Rect(cx - size // 2, cy - size // 2, size, size)
-                else:
-                    rect = pygame.Rect(
-                        x + dx + padding,
-                        y + dy + padding,
-                        self.cell_size - padding * 2,
-                        self.cell_size - padding * 2
-                    )
-                pygame.draw.rect(screen, color, rect, border_radius=8)
-                cx = rect.centerx
-                cy = rect.centery
-                if jewel == JEWEL.BOMB:
-                    size = 12
-                    bomb_rect = pygame.Rect(cx - size // 2, cy - size // 2, size, size)
-                    pygame.draw.rect(screen, (0, 0, 0), bomb_rect, border_radius=3)
-                elif jewel == JEWEL.LINE:
-                    pygame.draw.line(screen, (0, 0, 0), (rect.left + 4, cy),
-                                     (rect.right - 4, cy), 3)
-                    pygame.draw.line(screen, (0, 0, 0), (rect.left + 4, cy - 5),
-                                     (rect.right - 4, cy - 5), 2)
-                elif jewel == JEWEL.COLOR:
-                    pygame.draw.line(screen, (0, 0, 0), (cx - 8, cy), (cx + 8, cy), 3)
-                    pygame.draw.line(screen, (0, 0, 0), (cx, cy - 8), (cx, cy + 8), 3)
-                    pygame.draw.line(screen, (0, 0, 0), (cx - 6, cy - 6),
-                                     (cx + 6, cy + 6), 2)
-                    pygame.draw.line(screen, (0, 0, 0), (cx + 6, cy - 6),
-                                     (cx - 6, cy + 6), 2)
-                if self.selected == (i, j):
-                    pygame.draw.rect(screen, self.colors["white"], rect, 3, border_radius=8)
-        panel_x = self.offset_x + self.board.column * self.cell_size + 15
-        panel_y = self.offset_y
-        font_label = pygame.font.Font(None, 36)
-        font_value = pygame.font.Font(None, 46)
-        label = font_label.render("Score", True, self.colors["white"])
-        screen.blit(label, (panel_x, panel_y))
-        value = font_value.render(str(self.score), True, self.colors["white"])
-        screen.blit(value, (panel_x, panel_y + 35))
-        if self.mode == "time":
-            time_label = font_label.render("Time", True, self.colors["white"])
-            screen.blit(time_label, (panel_x, panel_y + 110))
-            seconds = max(0, int(self.time_left))
-            time_str = f"{seconds // 60}:{seconds % 60:02d}"
-            time_value = font_value.render(time_str, True, self.colors["white"])
-            screen.blit(time_value, (panel_x, panel_y + 145))
-        if self.mode == "score":
-            moves_label = font_label.render("Moves", True, self.colors["white"])
-            screen.blit(moves_label, (panel_x, panel_y + 110))
-            moves_value = font_value.render(str(self.moves_left), True, self.colors["white"])
-            screen.blit(moves_value, (panel_x, panel_y + 145))
-            goal_label = font_label.render("Goal", True, self.colors["white"])
-            screen.blit(goal_label, (panel_x, panel_y + 220))
-            goal_value = font_value.render(str(self.goal), True, self.colors["yellow"])
-            screen.blit(goal_value, (panel_x, panel_y + 255))
+        self._draw_board(screen)
+        self._draw_panel(screen)
 
     def _calc_drop_offsets(self):
         offsets = {}
@@ -184,7 +101,7 @@ class Game(Screen):
                 self.match_sound.play()
                 special = None
                 center = list(matches)[len(matches) // 2]
-                if (len(matches)) >= 5:
+                if len(matches) >= 5:
                     special = (center, JEWEL.COLOR)
                 elif len(matches) == 4:
                     special = (center, JEWEL.BOMB)
@@ -263,6 +180,95 @@ class Game(Screen):
             return self.time_left <= 0
         if self.mode == "score":
             return self.moves_left <= 0
+
+    def _draw_board(self, screen):
+        now = pygame.time.get_ticks()
+        progress = min(1.0, (now - self.anim_start) / self.anim_duration) if self.anim_state == "swapping" else 1.0
+
+        for i in range(self.board.row):
+            for j in range(self.board.column):
+                x = self.offset_x + j * self.cell_size
+                y = self.offset_y + i * self.cell_size
+                jewel = self.board.field[i][j]
+                if not jewel:
+                    continue
+                dx, dy = 0, 0
+                if self.anim_state == "swapping":
+                    r1, c1 = self.swap_from
+                    r2, c2 = self.swap_to
+                    if (i, j) == (r1, c1):
+                        dx = (c2 - c1) * self.cell_size * progress
+                        dy = (r2 - r1) * self.cell_size * progress
+                    elif (i, j) == (r2, c2):
+                        dx = (c1 - c2) * self.cell_size * progress
+                        dy = (r1 - r2) * self.cell_size * progress
+                if self.anim_state == "dropping" and (i, j) in self.drop_offsets:
+                    drop_progress = min(1.0, (now - self.drop_start) / self.drop_duration)
+                    cells = self.drop_offsets[(i, j)]
+                    dy = -cells * self.cell_size * (1.0 - drop_progress)
+                padding = 6
+                if self.anim_state == "removing" and (i, j) in self.removing:
+                    remove_progress = min(1.0, (now - self.remove_start) / self.remove_duration)
+                    scale = 1.0 - remove_progress
+                    if scale <= 0:
+                        continue
+                    half = self.cell_size // 2
+                    size = int((self.cell_size - padding * 2) * scale)
+                    cx = x + half
+                    cy = y + half
+                    rect = pygame.Rect(cx - size // 2, cy - size // 2, size, size)
+                else:
+                    rect = pygame.Rect(
+                        x + dx + padding,
+                        y + dy + padding,
+                        self.cell_size - padding * 2,
+                        self.cell_size - padding * 2
+                    )
+                pygame.draw.rect(screen, jewel.value, rect, border_radius=8)
+                self._draw_special(screen, jewel, rect)
+                if self.selected == (i, j):
+                    pygame.draw.rect(screen, self.colors["white"], rect, 3, border_radius=8)
+
+    def _draw_special(self, screen, jewel, rect):
+        cx, cy = rect.centerx, rect.centery
+        if jewel == JEWEL.BOMB:
+            size = 12
+            bomb_rect = pygame.Rect(cx - size // 2, cy - size // 2, size, size)
+            pygame.draw.rect(screen, (0, 0, 0), bomb_rect, border_radius=3)
+        elif jewel == JEWEL.LINE:
+            pygame.draw.line(screen, (0, 0, 0),
+                             (rect.left + 4, cy), (rect.right - 4, cy), 3)
+            pygame.draw.line(screen, (0, 0, 0),
+                             (rect.left + 4, cy - 5), (rect.right - 4, cy - 5), 2)
+        elif jewel == JEWEL.COLOR:
+            pygame.draw.line(screen, (0, 0, 0), (cx - 8, cy), (cx + 8, cy), 3)
+            pygame.draw.line(screen, (0, 0, 0), (cx, cy - 8), (cx, cy + 8), 3)
+            pygame.draw.line(screen, (0, 0, 0), (cx - 6, cy - 6), (cx + 6, cy + 6), 2)
+            pygame.draw.line(screen, (0, 0, 0), (cx + 6, cy - 6), (cx - 6, cy + 6), 2)
+
+    def _draw_panel(self, screen):
+        panel_x = self.offset_x + self.board.column * self.cell_size + 15
+        panel_y = self.offset_y
+        screen.blit(self.font_label.render("Score", True, self.colors["white"]), (panel_x, panel_y))
+        screen.blit(self.font_value.render(str(self.score), True,
+                                           self.colors["white"]), (panel_x, panel_y + 35))
+        if self.mode == "time":
+            screen.blit(self.font_label.render("Time", True
+                                               , self.colors["white"]), (panel_x, panel_y + 110))
+            seconds = max(0, int(self.time_left))
+            time_str = f"{seconds // 60}:{seconds % 60:02d}"
+            screen.blit(self.font_value.render(time_str, True,
+                                               self.colors["white"]), (panel_x, panel_y + 145))
+        elif self.mode == "score":
+            screen.blit(self.font_label.render("Moves", True,
+                                               self.colors["white"]), (panel_x, panel_y + 110))
+            screen.blit(self.font_value.render(str(self.moves_left), True,
+                                               self.colors["white"]), (panel_x, panel_y + 145))
+            screen.blit(self.font_label.render("Goal", True,
+                                               self.colors["white"]), (panel_x, panel_y + 220))
+            screen.blit(self.font_value.render(str(self.goal), True,
+                                               self.colors["yellow"]), (panel_x, panel_y + 255))
+
 
 class GameOver(Screen):
     def __init__(self, config: ConfigGame, score, mode, leaderboard: LeaderBoard, goal=None):

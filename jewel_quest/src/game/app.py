@@ -104,7 +104,7 @@ class App:
                 self._set_overlay("leaderboard")
 
     def _handle_game_over(self, event):
-        result = self.game_over.handle_event(event, self.lead)
+        result = self.game_over.handle_event_with_leaderboard(event, self.lead)
         if result == "menu":
             self.state = "menu"
             self.game_over = None
@@ -134,6 +134,8 @@ class App:
                 self.difficulty_select.draw(self.screen)
             case None:
                 if self.state == "game":
+                    if self.game is None:
+                        return
                     self.game.update()
                     if self.game.is_over():
                         self.state = "game_over"
