@@ -76,25 +76,25 @@ class Game(Screen):
         now = pygame.time.get_ticks()
         progress = min(1.0, (now - self.anim_start) / self.anim_duration)
         if self.anim_state == "swapping" and progress >= 1.0:
-            r1, c1 = self.swap_from
-            r2, c2 = self.swap_to
-            jewel1 = self.board.field[r1][c1]
-            jewel2 = self.board.field[r2][c2]
-            self.board.field[r1][c1], self.board.field[r2][c2] = \
-                self.board.field[r2][c2], self.board.field[r1][c1]
+            row_first, column_first = self.swap_from
+            row_second, column_second = self.swap_to
+            jewel1 = self.board.field[row_first][column_first]
+            jewel2 = self.board.field[row_second][column_second]
+            self.board.field[row_first][column_first], self.board.field[row_second][column_second] = \
+                self.board.field[row_second][column_second], self.board.field[row_first][column_first]
             extra = set()
             if jewel1 == JEWEL.BOMB:
-                extra |= self.board.apply_bomb(r2, c2)
+                extra |= self.board.apply_bomb(row_second, column_second)
             if jewel2 == JEWEL.BOMB:
-                extra |= self.board.apply_bomb(r1, c1)
+                extra |= self.board.apply_bomb(row_first, column_first)
             if jewel1 == JEWEL.LINE:
-                extra |= self.board.apply_line(r2, c2)
+                extra |= self.board.apply_line(row_second, column_second)
             if jewel2 == JEWEL.LINE:
-                extra |= self.board.apply_line(r1, c1)
+                extra |= self.board.apply_line(row_first, column_first)
             if jewel1 == JEWEL.COLOR:
-                extra |= self.board.apply_color(r2, c2, jewel2)
+                extra |= self.board.apply_color(row_second, column_second, jewel2)
             if jewel2 == JEWEL.COLOR:
-                extra |= self.board.apply_color(r1, c1, jewel1)
+                extra |= self.board.apply_color(row_first, column_first, jewel1)
             matches = self.board.find_matches()
             matches |= extra
             if matches:
@@ -113,8 +113,8 @@ class Game(Screen):
                     self.moves_left -= 1
                 self.score += len(matches) * self.points_per_jewel
             else:
-                self.board.field[r1][c1], self.board.field[r2][c2] = \
-                    self.board.field[r2][c2], self.board.field[r1][c1]
+                self.board.field[row_first][column_first], self.board.field[row_second][column_second] = \
+                    self.board.field[row_second][column_second], self.board.field[row_first][column_first]
                 self.anim_state = "idle"
         if self.anim_state == "removing":
             remove_progress = min(1.0, (now - self.remove_start) / self.remove_duration)
@@ -169,9 +169,9 @@ class Game(Screen):
             if self.selected is None:
                 self.selected = cell
             else:
-                r1, c1 = self.selected
-                r2, c2 = cell
-                if abs(r1 - r2) + abs(c1 - c2) == 1:
+                row_first, column_first = self.selected
+                row_second, column_second = cell
+                if abs(row_first - row_second) + abs(column_first - column_second) == 1:
                     self.start_swap(self.selected, cell)
                 self.selected = None
 
@@ -194,14 +194,14 @@ class Game(Screen):
                     continue
                 dx, dy = 0, 0
                 if self.anim_state == "swapping":
-                    r1, c1 = self.swap_from
-                    r2, c2 = self.swap_to
-                    if (i, j) == (r1, c1):
-                        dx = (c2 - c1) * self.cell_size * progress
-                        dy = (r2 - r1) * self.cell_size * progress
-                    elif (i, j) == (r2, c2):
-                        dx = (c1 - c2) * self.cell_size * progress
-                        dy = (r1 - r2) * self.cell_size * progress
+                    row_first, column_first = self.swap_from
+                    row_second, column_second = self.swap_to
+                    if (i, j) == (row_first, column_first):
+                        dx = (column_second - column_first) * self.cell_size * progress
+                        dy = (row_second - row_first) * self.cell_size * progress
+                    elif (i, j) == (row_second, column_second):
+                        dx = (column_first - column_second) * self.cell_size * progress
+                        dy = (row_first - row_second) * self.cell_size * progress
                 if self.anim_state == "dropping" and (i, j) in self.drop_offsets:
                     drop_progress = min(1.0, (now - self.drop_start) / self.drop_duration)
                     cells = self.drop_offsets[(i, j)]

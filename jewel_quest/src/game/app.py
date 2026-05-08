@@ -1,6 +1,6 @@
 import pygame
 from src.common.config import ConfigGame
-from src.game.menu import Menu, ConfirmDialog, Reference, ModeSelect, DifficultySelect
+from src.game.menu import Menu, ConfirmDialog, Help, ModeSelect, DifficultySelect
 from src.game.leaderboard import LeaderBoardScreen, LeaderBoard
 from src.game.game import Game, GameOver
 
@@ -19,7 +19,7 @@ class App:
         self._play_music("menu_music")
         self.lead = LeaderBoard()
         self.menu = Menu(self.config)
-        self.ref = Reference(self.config)
+        self.ref = Help(self.config)
         self.dialog = ConfirmDialog(self.config, "Quit?")
         self.mode_select = ModeSelect(self.config)
         self.difficulty_select = DifficultySelect(self.config)

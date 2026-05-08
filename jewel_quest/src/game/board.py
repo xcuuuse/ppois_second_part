@@ -37,18 +37,6 @@ class Board:
                     to_remove.add((i + 2, j))
         return to_remove
 
-    def remove_matches(self):
-        to_remove = self.find_matches()
-        for i, j in to_remove:
-            self.field[i][j] = None
-        return len(to_remove)
-
-    def print_board(self):
-        for i in range(self.row):
-            for j in range(self.column):
-                print(self.field[i][j], end=" ")
-            print("\n")
-
     def drop_jewels(self):
         for j in range(self.column):
             column = [self.field[i][j] for i in range(self.row)]
@@ -68,20 +56,20 @@ class Board:
 
     def apply_bomb(self, row: int, column: int):
         to_remove = set()
-        for di in range(-1, 2):
-            for dj in range(-1, 2):
-                ni, nj = row + di, column + dj
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                ni, nj = row + i, column + j
                 if 0 <= ni < self.row and 0 <= nj < self.column:
                     to_remove.add((ni, nj))
         return to_remove
 
-    def apply_line(self, row, column):
+    def apply_line(self, row):
         to_remove = set()
         for j in range(self.column):
             to_remove.add((row, j))
         return to_remove
 
-    def apply_color(self, row, column, target_color):
+    def apply_color(self, target_color):
         to_remove = set()
         for i in range(self.row):
             for j in range(self.column):

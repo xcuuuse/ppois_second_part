@@ -50,7 +50,7 @@ class ConfirmDialog(Screen):
         screen.blit(no_text, no_text.get_rect(center=self.no_rect.center))
 
 
-class Reference(Screen):
+class Help(Screen):
     def __init__(self, config: ConfigGame):
         super().__init__(config)
         dialog_width, dialog_height = 400, 200

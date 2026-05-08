@@ -36,8 +36,8 @@ class LeaderBoardScreen(Screen):
     def __init__(self, config: ConfigGame, leaderboard: LeaderBoard):
         super().__init__(config)
         self.leaderboard = leaderboard
-        dw, dh = 400, 200
-        self.leaderboard_rect = pygame.Rect(self.width, self.height, dw, dh)
+        dialog_width, dialog_height = 400, 200
+        self.leaderboard_rect = pygame.Rect(self.width, self.height, dialog_width, dialog_height)
         self.font_text = pygame.font.Font(None, 60)
 
     def handle_event(self, event):
@@ -50,7 +50,7 @@ class LeaderBoardScreen(Screen):
         screen.fill(self.colors["black"])
         title = self.font_title.render("Leaderboard", True, self.colors["white"])
         screen.blit(title, title.get_rect(center=(self.width // 2, 60)))
-        if self.leaderboard is None or len(self.leaderboard.records) == 0:
+        if len(self.leaderboard.records) == 0:
             empty = self.font_text.render("No records yet", True, self.colors["gray"])
             screen.blit(empty, empty.get_rect(center=(self.width // 2, self.height // 2)))
         else:
