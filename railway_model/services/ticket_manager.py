@@ -1,7 +1,7 @@
-from passenger.passenger import Passenger
-from passenger.ticket import Ticket
-from compound.compound import Compound, Coach
-from exceptions.exceptions import TicketSellingError
+from domain.passenger.passenger import Passenger
+from domain.passenger.ticket import Ticket
+from domain.compound.compound import Compound, Coach
+from domain.exceptions.exceptions import TicketSellingError
 
 
 class TicketManager:

@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
-from compound.compound import Compound
-from compound.locomotive import Locomotive
-from compound.coach import Coach
-from enums.enums import TrainState
-from management.timetable import Timetable, TimetableCell
-from railway.route import Railway, Route
-from railway.station import Station
+from domain.compound.compound import Compound
+from domain.compound.locomotive import Locomotive
+from domain.compound.coach import Coach
+from domain.enums.enums import TrainState
+from services.timetable import Timetable, TimetableCell
+from domain.railway.route import Railway, Route
+from domain.railway.station import Station
 
 
 class Serializer:

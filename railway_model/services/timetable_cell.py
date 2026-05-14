@@ -1,6 +1,6 @@
-from compound.compound import Compound
-from railway.route import Route
-from cli.timer import Timer
+from domain.compound.compound import Compound
+from domain.railway.route import Route
+from persistence.timer import Timer
 
 
 class TimetableCell:

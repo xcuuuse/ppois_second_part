@@ -1,22 +1,22 @@
-from cli.timer import Timer
-from cli.parser import Parser
-from passenger.passenger import Passenger
-from exceptions.exceptions import (
+from persistence.timer import Timer
+from interfaces.cli.parser import Parser
+from domain.passenger.passenger import Passenger
+from domain.exceptions.exceptions import (
     TimetableError,
     SeatError,
     CreatingEntityError
 )
 from pathlib import Path
-from railway.route import Route, Railway
-from management.serializer import Serializer
-from compound.compound import Compound, Locomotive, Coach
-from management.timetable import Timetable, TimetableCell
-from management.ticket_manager import TicketManager
-from management.passenger_serializer import PassengerSerializer
-from railway.station import Station
-from management.validator import Validator
-from management.timetable_manager import TimetableManager
-from management.locomotive_manager import LocomotiveManager
+from domain.railway.route import Route, Railway
+from persistence.serializer import Serializer
+from domain.compound.compound import Compound, Locomotive, Coach
+from services.timetable import Timetable, TimetableCell
+from services.ticket_manager import TicketManager
+from persistence.passenger_serializer import PassengerSerializer
+from domain.railway.station import Station
+from services.validator import Validator
+from services.timetable_manager import TimetableManager
+from services.locomotive_manager import LocomotiveManager
 
 
 class Cli:
@@ -32,8 +32,8 @@ class Cli:
 
     @staticmethod
     def __free_compound(compound: Compound):
-        for i in compound.coaches:
-            i.free_seat([i for i in range(len(i.seats.keys()))])
+        for coach in compound.coaches:
+            coach.free_coach()
 
     @staticmethod
     def __find_cell_by_comp_id(timetable: Timetable, compound_id: int):

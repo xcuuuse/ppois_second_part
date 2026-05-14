@@ -1,5 +1,5 @@
 import json
-from exceptions.exceptions import TimetableError
+from domain.exceptions.exceptions import TimetableError
 
 
 class Timer:
@@ -28,7 +28,7 @@ class Timer:
     def set_time(time_hhmm: str):
         hour, minute = map(int, time_hhmm.split(":"))
         time = hour * 60 + minute
-        if time >= 1449:
+        if time >= 1440:
             raise TimetableError("Cant set time more than 23:59")
         Timer.save_time(time)
         return time

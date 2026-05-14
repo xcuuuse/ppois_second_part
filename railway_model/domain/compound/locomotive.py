@@ -1,6 +1,6 @@
 import random
-from exceptions.exceptions import LocomotiveUsingError
-from management.validator import Validator
+from domain.exceptions.exceptions import LocomotiveUsingError
+from services.validator import Validator
 
 
 class Locomotive:
@@ -12,11 +12,13 @@ class Locomotive:
         self.minimum_damage_level: float = 0.01
         self.maximum_damage_level: float = 0.3
 
-    def check_state(self):
+    def check_state(self) -> bool:
         if self.is_usable:
-            prob = min(self.minimum_damage_level + self.usage_count*0.01, self.maximum_damage_level)
+            prob = min(self.minimum_damage_level + self.usage_count * 0.01,
+                       self.maximum_damage_level)
             if random.random() < prob:
                 self.is_usable = False
+        return self.is_usable
 
     def start_engine(self):
         self.check_state()

@@ -63,13 +63,13 @@ class Board:
                     to_remove.add((ni, nj))
         return to_remove
 
-    def apply_line(self, row):
+    def apply_line(self, row, column):
         to_remove = set()
         for j in range(self.column):
             to_remove.add((row, j))
         return to_remove
 
-    def apply_color(self, target_color):
+    def apply_color(self, row, column, target_color):
         to_remove = set()
         for i in range(self.row):
             for j in range(self.column):

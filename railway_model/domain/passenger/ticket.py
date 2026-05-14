@@ -1,4 +1,4 @@
-from compound.compound import Compound, Coach
+from domain.compound.compound import Compound, Coach
 
 
 class Ticket:

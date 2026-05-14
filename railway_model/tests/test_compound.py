@@ -1,10 +1,10 @@
 import pytest
-from compound.coach import Coach
-from compound.compound import Compound, TrainState, Route
-from railway.station import Station
-from exceptions.exceptions import CreatingEntityError, InvalidStateError, SeatError
-from management.locomotive_manager import LocomotiveManager, Locomotive
-from railway.railway import Railway
+from domain.compound.coach import Coach
+from domain.compound.compound import Compound, TrainState, Route
+from domain.railway.station import Station
+from domain.exceptions.exceptions import CreatingEntityError, SeatError
+from services.locomotive_manager import LocomotiveManager, Locomotive
+from domain.railway.railway import Railway
 
 
 def test_coach_free_seats():

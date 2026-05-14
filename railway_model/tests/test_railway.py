@@ -1,5 +1,5 @@
-from railway.station import Station
-from railway.route import Railway, Route
+from domain.railway.station import Station
+from domain.railway import Railway, Route
 
 
 def test_station():

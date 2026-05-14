@@ -1,4 +1,4 @@
-from cli.cli import Cli
+from interfaces.cli.cli import Cli
 
 if __name__ == "__main__":
     Cli.cli()

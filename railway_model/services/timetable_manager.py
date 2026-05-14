@@ -1,6 +1,6 @@
 from .timetable_cell import TimetableCell
 from .timetable import Timetable
-from exceptions.exceptions import TimetableError
+from domain.exceptions.exceptions import TimetableError
 
 
 class TimetableManager:

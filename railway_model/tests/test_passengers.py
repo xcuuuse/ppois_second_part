@@ -1,11 +1,11 @@
 import pytest
-from exceptions.exceptions import TicketSellingError
-from passenger.passenger import Passenger, Ticket
-from compound.compound import Compound, Locomotive, Coach
-from management.ticket_manager import TicketManager
-from management.timetable_manager import TimetableManager, TimetableCell, Timetable, TimetableError
-from railway.route import Route, Railway
-from railway.station import Station
+from domain.exceptions.exceptions import TicketSellingError
+from domain.passenger import Passenger
+from domain.compound.compound import Compound, Locomotive, Coach
+from services.ticket_manager import TicketManager
+from services.timetable_manager import TimetableManager, TimetableCell, Timetable, TimetableError
+from domain.railway import Route, Railway
+from domain.railway.station import Station
 
 
 def test_passenger():

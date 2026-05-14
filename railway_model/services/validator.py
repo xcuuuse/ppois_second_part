@@ -1,4 +1,4 @@
-from exceptions.exceptions import CreatingEntityError
+from domain.exceptions.exceptions import CreatingEntityError
 from typing import Dict
 
 

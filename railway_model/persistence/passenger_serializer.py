@@ -1,11 +1,9 @@
 import json
-from typing import Dict
-from passenger.passenger import Passenger
+from domain.passenger.passenger import Passenger
 from pathlib import Path
-from exceptions.exceptions import TimetableError
-from management.ticket_manager import TicketManager
-from management.timetable import Timetable
-from passenger.ticket import Ticket
+from domain.exceptions.exceptions import TimetableError
+from services.timetable import Timetable
+from domain.passenger.ticket import Ticket
 
 
 class PassengerSerializer:

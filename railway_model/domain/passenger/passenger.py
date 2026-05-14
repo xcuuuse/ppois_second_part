@@ -1,5 +1,5 @@
 from typing import List
-from management.validator import Validator
+from services.validator import Validator
 from .ticket import Ticket
 
 

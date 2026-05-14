@@ -1,11 +1,6 @@
 {
   "records": [
     {
-      "name": "first",
-      "score": 2170,
-      "mode": "score"
-    },
-    {
       "name": "name",
       "score": 1490,
       "mode": "score"

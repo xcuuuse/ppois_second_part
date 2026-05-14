@@ -1,12 +1,12 @@
 import pytest
 import os
-from compound.compound import Compound
-from compound.locomotive import Locomotive
-from compound.coach import Coach
-from management.timetable import Timetable, TimetableCell
-from railway.route import Railway, Route
-from railway.station import Station
-from management.serializer import Serializer
+from domain.compound.compound import Compound
+from domain.compound.locomotive import Locomotive
+from domain.compound.coach import Coach
+from services.timetable import Timetable, TimetableCell
+from domain.railway import Railway, Route
+from domain.railway.station import Station
+from persistence.serializer import Serializer
 
 
 @pytest.fixture

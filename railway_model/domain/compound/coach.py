@@ -1,5 +1,5 @@
-from exceptions.exceptions import SeatError
-from management.validator import Validator
+from domain.exceptions.exceptions import SeatError
+from services.validator import Validator
 
 
 class Coach:

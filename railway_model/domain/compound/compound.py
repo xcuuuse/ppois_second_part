@@ -1,9 +1,9 @@
 from typing import List
-from compound.locomotive import Locomotive
-from compound.coach import Coach
-from railway.route import Route
-from enums.enums import TrainState
-from exceptions.exceptions import InvalidStateError
+from domain.compound.locomotive import Locomotive
+from domain.compound.coach import Coach
+from domain.railway.route import Route
+from domain.enums.enums import TrainState
+from domain.exceptions.exceptions import InvalidStateError
 
 
 class Compound:
@@ -60,9 +60,11 @@ class Compound:
             coach.free_coach()
 
     def check_state(self):
-        if not self.locomotive.check_state():
+        self.locomotive.check_state()
+        if not self.locomotive.is_usable:
             self.state = TrainState.MAINTENANCE
-        self.state = TrainState.STOPPED
+        else:
+            self.state = TrainState.STOPPED
 
 
 

@@ -51,6 +51,7 @@ class App:
                     self._handle_event(event)
             self._draw()
             pygame.display.flip()
+            pygame.display.update()
             self.clock.tick(self.screen_config["fps"])
         pygame.quit()
 

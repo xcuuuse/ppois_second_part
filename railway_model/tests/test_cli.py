@@ -1,10 +1,10 @@
 import pytest
 import sys
-from cli.cli import Cli
-from management.serializer import Serializer
-from management.passenger_serializer import PassengerSerializer
-from cli.timer import Timer
-from cli.parser import Parser
+from interfaces.cli import Cli
+from persistence.serializer import Serializer
+from persistence.passenger_serializer import PassengerSerializer
+from persistence.timer import Timer
+from interfaces.cli import Parser
 
 
 @pytest.fixture()

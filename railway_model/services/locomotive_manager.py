@@ -1,5 +1,4 @@
-from exceptions.exceptions import LocomotiveUsingError
-from compound.locomotive import Locomotive
+from domain.compound.locomotive import Locomotive
 from typing import List
 
 
