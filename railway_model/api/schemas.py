@@ -31,6 +31,11 @@ class CompoundStateResponse(BaseModel):
     state_name: str
     coaches: List[CoachStateResponse]
 
+class BookSeatRequest(BaseModel):
+    coach_number: int = Field(gt=0)
+    seat_number: int = Field(gt=0)
+    passenger_id: int = Field(gt=0)
+
 
 class BookingResponse(BaseModel):
     passenger_id: int
