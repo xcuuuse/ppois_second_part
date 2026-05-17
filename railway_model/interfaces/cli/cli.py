@@ -1,200 +1,142 @@
-from persistence.timer import Timer
-from interfaces.cli.parser import Parser
-from domain.passenger.passenger import Passenger
-from domain.exceptions.exceptions import (
-    TimetableError,
-    SeatError,
-    CreatingEntityError
-)
 from pathlib import Path
-from domain.railway.route import Route, Railway
-from persistence.serializer import Serializer
-from domain.compound.compound import Compound, Locomotive, Coach
-from services.timetable import Timetable, TimetableCell
-from services.ticket_manager import TicketManager
-from persistence.passenger_serializer import PassengerSerializer
-from domain.railway.station import Station
-from services.validator import Validator
-from services.timetable_manager import TimetableManager
+from management.timer import Timer
+from services.compound_service import CompoundService
+from services.booking_service import BookingService
 from services.locomotive_manager import LocomotiveManager
-
+from services.passenger_service import PassengerService
+from services.simulation_service import SimulationService
+from interfaces.cli.parser import Parser
+from persistence.json_timetable_repository import JsonTimetableRepository
+from persistence.json_passenger_repository import JsonPassengerRepository
+from persistence.json_clock import JsonClock
+from services.timetable_manager import TimetableManager
 
 class Cli:
     @staticmethod
-    def __create_compound(locomotive_number: int, coach_amount: int, seats=10, price=25) -> Compound:
-        Validator.validate(locals(), {
-            "locomotive_number": (int, lambda x: x >= 0),
-            "coach_amount": (int, lambda x: x > 0),
-        })
-        locomotive = Locomotive(locomotive_number)
-        coaches = [Coach(i+1, seats, price)for i in range(coach_amount)]
-        return Compound(locomotive, coaches)
+    def _print_departures(departures):
+        for d in departures:
+            if d.status == "departing":
+                print(f"[DEPARTING] Compound {d.compound_id} "
+                      f"departs from {d.from_station} "
+                      f"at {Timer.format_time(d.departure_time)}")
+            else:
+                print(f"[SOON] Compound {d.compound_id} "
+                      f"departs in {d.minutes_until} min "
+                      f"({Timer.format_time(d.departure_time)})")
 
     @staticmethod
-    def __free_compound(compound: Compound):
-        for coach in compound.coaches:
-            coach.free_coach()
+    def _print_movement_events(events):
+        for event in events:
+            if event.kind == "completed":
+                print(f"Compound {event.compound_id} reached final station "
+                      f"({event.station_name}), freeing seats")
 
     @staticmethod
-    def __find_cell_by_comp_id(timetable: Timetable, compound_id: int):
-        for cell in timetable.cells:
-            if cell.compound.compound_id == compound_id:
-                return cell
-        return None
-
-    @staticmethod
-    def __check_timetable(timetable: Timetable, current_time: int):
-        for cell in timetable.cells:
-            departure = cell.time
-            if departure == current_time:
-                print(f"[DEPARTING] Compound {cell.compound.compound_id} "
-                      f"departs from {cell.route.stations[0].name} "
-                      f"at {Timer.format_time(departure)}")
-            elif current_time < departure <= current_time + 30:
-                print(f"[SOON] Compound {cell.compound.compound_id} "
-                      f"departs in {departure - current_time} min "
-                      f"({Timer.format_time(departure)})")
-
-    @staticmethod
-    def __get_cell(timetable: Timetable, compound_id: int) -> TimetableCell:
-        cell = Cli.__find_cell_by_comp_id(timetable, compound_id)
-        if not cell:
-            raise TimetableError(f"Compound {compound_id} not found")
-        return cell
-
-    @staticmethod
-    def __state(cell: TimetableCell):
-        compound = cell.compound
-        route = cell.route
+    def _print_state(state):
         print("\nCurrent state ")
-        print(f"Compound ID: {compound.compound_id}")
-        if compound.current_pos < len(route.stations):
-            print(f"Pos: {compound.current_pos} ({route.stations[compound.current_pos].name})")
+        print(f"Compound ID: {state.compound_id}")
+        if state.current_station is not None:
+            print(f"Pos: {state.current_pos} ({state.current_station})")
         else:
             print("Pos: The route is completed")
-        print(f"State: {compound.state.name}")
+        print(f"State: {state.state_name}")
         print("\nCoaches:")
-        for coach in compound.coaches:
-            print(f"Coach {coach.number} (price: {coach.seat_price}): {coach.free_seats} free seats")
+        for coach in state.coaches:
+            print(f"Coach {coach.number} (price: {coach.seat_price}): "
+                  f"{coach.free_seats} free seats")
 
     @staticmethod
-    def __move(cell: TimetableCell):
-        compound = cell.compound
-        route = cell.route
-        compound.locomotive.start_engine()
-        print(f"\nMoving compound {compound.compound_id}")
-        compound.move_along_route(route)
-        if compound.current_pos == len(route.stations) - 1:
-            print(f"Compound {compound.compound_id} reached final station, freeing seats")
-            compound.process_station_actions()
-            PassengerSerializer.remove_tickets_for_compound(compound.compound_id)
-
-    @staticmethod
-    def __book(cell: TimetableCell, timetable: Timetable, parser):
-        compound = cell.compound
-        route = cell.route
-        if parser.coach < 1 or parser.coach > len(compound.coaches):
-            raise SeatError(f"Coach {parser.coach} does not exist.")
-        coach = compound.coaches[parser.coach - 1]
-        if parser.seat not in coach.seats:
-            raise SeatError(f"Seat {parser.seat} does not exist in coach {parser.coach}.")
-        if parser.seat not in coach.free_seats:
-            raise SeatError(f"Seat {parser.seat} in coach {parser.coach} is already occupied")
-        if coach.seats[parser.seat] == parser.pass_id:
-            raise SeatError(f"Passenger {parser.pass_id} already occupies seat {parser.seat}")
-        passenger = PassengerSerializer.get_passenger(parser.pass_id, timetable)
-        TicketManager.create_ticket(passenger, compound, coach, parser.seat, cell.time)
-        PassengerSerializer.save_passenger(passenger)
-        print(f"Seat {parser.seat} in coach {parser.coach} booked for passenger {parser.pass_id}")
-        print(
-            f"Departure time: {Timer.format_time(cell.time)},"
-            f" Route: {route.stations[0].name}->{route.stations[-1].name}")
-
-    @staticmethod
-    def __service(cell: TimetableCell):
-        locomotive = cell.compound.locomotive
-        LocomotiveManager.check_locomotive(locomotive)
-
-    @staticmethod
-    def __create(timetable, args):
-        for cell in timetable.cells:
-            if cell.compound.locomotive.number == args.loco_number:
-                raise CreatingEntityError(f"The locomotive {args.loco_number} is already occupied")
-        new_compound = Cli.__create_compound(
+    def _handle_compound(timetable, args):
+        result = CompoundService.create_compound(
+            timetable=timetable,
             locomotive_number=args.loco_number,
             coach_amount=args.coach_amount,
+            end_station_name=args.end_station,
+            departure_time=args.time,
             seats=args.seats,
             price=args.price
         )
-        start_station = Station("O")
-        end_station = Station(args.end_station)
-        route = Route([Railway({start_station, end_station}, 100)])
-        TimetableManager.add_cell(timetable, TimetableCell(new_compound, route, args.time))
-        print(f"Created new compound ID={new_compound.compound_id}")
-        print(f"Route: O -> {args.end_station}")
-        print(f"Departure time: {Timer.format_time(args.time)}")
+        print(f"Created new compound ID={result.compound_id}")
+        print(f"Route: {result.route_from} -> {result.route_to}")
+        print(f"Departure time: {Timer.format_time(result.departure_time)}")
 
     @staticmethod
-    def __passenger(args):
-        data = PassengerSerializer.load_passengers()
-        Passenger.id_counter = data.get("id_counter", 1)
-        passenger = Passenger(args.name, args.finance)
-        PassengerSerializer.save_passenger(passenger)
-        print(f"Created passenger ID={passenger.passenger_id}, name={passenger.name}")
+    def _handle_state(timetable, args):
+        Cli._print_state(CompoundService.get_state(timetable, args.state_id))
 
     @staticmethod
-    def __set_time(time: int):
-        current_time = Timer.load_time()
-        if time <= current_time:
-            raise TimetableError("You cant set time less than now")
-        Timer.set_time(Timer.format_time(time))
-        print(f"Time set to {Timer.format_time(time)} ({time} minutes after midnight)")
+    def _handle_book(timetable, args, passengers):
+        result = BookingService.book_seat(
+            timetable=timetable,
+            compound_id=args.comp_book_id,
+            coach_number=args.coach,
+            seat_number=args.seat,
+            passenger_id=args.pass_id,
+            passengers=passengers
+        )
+        print(f"Seat {result.seat_number} in coach {result.coach_number} "
+              f"booked for passenger {result.passenger_id}")
+        print(f"Departure time: {Timer.format_time(result.departure_time)}, "
+              f"Route: {result.route_from}->{result.route_to}")
+
+    @staticmethod
+    def _handle_service(timetable, args):
+        cell = BookingService._find_cell(timetable, args.number_to_service)
+        LocomotiveManager.check_locomotive(cell.compound.locomotive)
+
+    @staticmethod
+    def _handle_passenger(args, passengers):
+        result = PassengerService.create_passenger(args.name, args.finance, passengers)
+        print(f"Created passenger ID={result.passenger_id}, name={result.name}")
+
+    @staticmethod
+    def _handle_tick(timetable, args, clock, passengers):
+        result = SimulationService.tick(timetable, args.minutes, clock, passengers)
+        print(f"Time advanced to: {Timer.format_time(result.new_time)}")
+        Cli._print_movement_events(result.movement_events)
+        Cli._print_departures(result.departures)
+
+    @staticmethod
+    def _handle_settime(args, clock):
+        new_time = SimulationService.set_time(args.time, clock)
+        print(f"Time set to {Timer.format_time(new_time)} "
+              f"({new_time} minutes after midnight)")
+
+    @staticmethod
+    def _handle_now(timetable, clock):
+        current, departures = SimulationService.now(timetable, clock)
+        print(f"Time: {Timer.format_time(current)}")
+        Cli._print_departures(departures)
 
     @staticmethod
     def cli():
         parser = Parser.build_parser()
         arguments = parser.parse_args()
+        if hasattr(arguments, "file") and arguments.file:
+            timetable_repo = JsonTimetableRepository(str(Path(arguments.file)))
+        else:
+            timetable_repo = JsonTimetableRepository()
+        passenger_repo = JsonPassengerRepository()
+        clock = JsonClock()
         timetable = None
-        state_path = Path(arguments.file if hasattr(arguments, "file") else Serializer.STATE_FILE)
         try:
-            try:
-                timetable = Serializer.load_state(str(state_path))
-            except FileNotFoundError:
-                print("State file not found, creating empty timetable")
-                timetable = Timetable()
+            timetable = timetable_repo.load()
             if not arguments.command:
                 parser.print_help()
                 return 0
-
             match arguments.command:
-                case "compound":
-                    Cli.__create(timetable, arguments)
-                case "state":
-                    Cli.__state(Cli.__get_cell(timetable, arguments.state_id))
-                case "book":
-                    Cli.__book(Cli.__get_cell(timetable, arguments.comp_book_id), timetable, arguments)
-                case "service":
-                    Cli.__service(Cli.__get_cell(timetable, arguments.number_to_service))
-                case "timetable":
-                    TimetableManager.show_timetable(timetable)
-                case "passenger":
-                    Cli.__passenger(arguments)
-                case "tick":
-                    new_time = Timer.advance(arguments.minutes)
-                    print(f"Time advanced to: {Timer.format_time(new_time)}")
-                    for cell in timetable.cells:
-                        if cell.time <= new_time and cell.compound.current_pos < len(cell.route.stations) - 1:
-                            Cli.__move(cell)
-                    Cli.__check_timetable(timetable, new_time)
-                case "settime":
-                    Cli.__set_time(arguments.time)
-                case "now":
-                    current_time = Timer.load_time()
-                    print(f"Time: {Timer.format_time(current_time)}")
-                    Cli.__check_timetable(timetable, current_time)
+                case "compound": Cli._handle_compound(timetable, arguments)
+                case "state": Cli._handle_state(timetable, arguments)
+                case "book": Cli._handle_book(timetable, arguments, passenger_repo)
+                case "service": Cli._handle_service(timetable, arguments)
+                case "timetable": TimetableManager.show_timetable(timetable)
+                case "passenger": Cli._handle_passenger(arguments, passenger_repo)
+                case "tick": Cli._handle_tick(timetable, arguments, clock, passenger_repo)
+                case "settime": Cli._handle_settime(arguments, clock)
+                case "now": Cli._handle_now(timetable, clock)
                 case "exit":
-                    Timer.reset_time()
-                    print("Exiting...")
+                    clock.reset()
+                    print("Exiting")
                     return 0
                 case _:
                     parser.print_help()
@@ -204,7 +146,5 @@ class Cli:
             return 1
         finally:
             if timetable is not None and arguments.command not in ("exit", "passenger"):
-                Serializer.save_state(timetable, str(state_path))
+                timetable_repo.save(timetable)
         return 0
-
-

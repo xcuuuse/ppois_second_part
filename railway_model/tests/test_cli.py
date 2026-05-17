@@ -1,9 +1,9 @@
 import pytest
 import sys
 from interfaces.cli import Cli
-from persistence.serializer import Serializer
-from persistence.passenger_serializer import PassengerSerializer
-from persistence.timer import Timer
+from management.serializer import Serializer
+from management.passenger_serializer import PassengerSerializer
+from management.timer import Timer
 from interfaces.cli import Parser
 
 

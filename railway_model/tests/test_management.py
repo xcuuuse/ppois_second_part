@@ -6,7 +6,7 @@ from domain.compound.coach import Coach
 from services.timetable import Timetable, TimetableCell
 from domain.railway import Railway, Route
 from domain.railway.station import Station
-from persistence.serializer import Serializer
+from management.serializer import Serializer
 
 
 @pytest.fixture
