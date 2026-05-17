@@ -145,6 +145,8 @@ class Cli:
             print(f"Error: {str(e)}")
             return 1
         finally:
+
+
             if timetable is not None and arguments.command not in ("exit", "passenger"):
                 timetable_repo.save(timetable)
         return 0
